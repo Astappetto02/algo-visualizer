@@ -19,6 +19,38 @@ const defaultEdges = (): VisualGraphEdge[] => [
   { from: 'D', to: 'E', weight: 2, status: 'idle' }
 ];
 
+export function prepareGraph(customEdges?: {from: string, to: string, weight: number}[]) {
+  if (!customEdges || customEdges.length === 0) {
+    return { nodes: defaultNodes(), edges: defaultEdges() };
+  }
+  
+  const uniqueIds = Array.from(new Set(customEdges.flatMap(e => [e.from, e.to])));
+  const nodes: VisualGraphNode[] = uniqueIds.map((id, index) => {
+    // Layout in a circle
+    const angle = (index / uniqueIds.length) * 2 * Math.PI - Math.PI / 2;
+    const radius = Math.max(120, uniqueIds.length * 20);
+    const cx = 275;
+    const cy = 180;
+    return {
+      id,
+      label: id,
+      x: cx + radius * Math.cos(angle),
+      y: cy + radius * Math.sin(angle),
+      status: 'idle'
+    };
+  });
+  
+  const edges: VisualGraphEdge[] = customEdges.map(e => ({
+    from: e.from,
+    to: e.to,
+    weight: e.weight || 1,
+    status: 'idle'
+  }));
+
+  return { nodes, edges };
+}
+
+
 // ==========================================
 // 1. BFS / DFS Graph Visits
 // ==========================================
@@ -57,22 +89,23 @@ export const bfsDfsDefinition: AlgorithmDefinition = {
   ]
 };
 
-export function generateBfsDfsSnapshots(isBFS: boolean = true): AlgorithmSnapshot[] {
+export function generateBfsDfsSnapshots(isBFS: boolean = true, customEdges?: {from: string, to: string, weight: number}[]): AlgorithmSnapshot[] {
   const snapshots: AlgorithmSnapshot[] = [];
-  const nodes = defaultNodes();
-  const edges = defaultEdges();
+  const { nodes, edges } = prepareGraph(customEdges);
 
   // Adjacency list
-  const adj: Record<string, string[]> = {
-    A: ['B', 'C'],
-    B: ['A', 'C', 'D'],
-    C: ['A', 'B', 'D', 'E'],
-    D: ['B', 'C', 'E'],
-    E: ['C', 'D']
-  };
+  const adj: Record<string, string[]> = {};
+  for (const node of nodes) adj[node.id] = [];
+  
+  for (const edge of edges) {
+    if (!adj[edge.from].includes(edge.to)) adj[edge.from].push(edge.to);
+    if (!adj[edge.to].includes(edge.from)) adj[edge.to].push(edge.from); // assuming undirected for BFS/DFS visually
+  }
 
-  const frontier: string[] = ['A'];
-  const visited = new Set<string>(['A']);
+  const startNode = nodes[0]?.id || 'A';
+  const frontier: string[] = [startNode];
+  const visited = new Set<string>([startNode]);
+
 
   const addSnapshot = (
     codeLine: number,
@@ -112,7 +145,7 @@ export function generateBfsDfsSnapshots(isBFS: boolean = true): AlgorithmSnapsho
     });
   };
 
-  addSnapshot(1, `Inizio visita (${isBFS ? 'BFS' : 'DFS'}). Inseriamo il nodo sorgente A nella frontiera.`, null);
+  addSnapshot(1, `Inizio visita (${isBFS ? 'BFS' : 'DFS'}). Inseriamo il nodo sorgente ${startNode} nella frontiera.`, null);
 
   while (frontier.length > 0) {
     const curr = isBFS ? frontier.shift()! : frontier.pop()!;
@@ -184,25 +217,21 @@ export const dijkstraDefinition: AlgorithmDefinition = {
   ]
 };
 
-export function generateDijkstraSnapshots(): AlgorithmSnapshot[] {
+export function generateDijkstraSnapshots(customEdges?: {from: string, to: string, weight: number}[]): AlgorithmSnapshot[] {
   const snapshots: AlgorithmSnapshot[] = [];
-  const nodes = defaultNodes();
-  const edges = defaultEdges();
+  const { nodes, edges } = prepareGraph(customEdges);
 
-  // Adjacency matrix representation for distance updates
-  const adjList = [
-    { from: 'A', to: 'B', w: 4 },
-    { from: 'A', to: 'C', w: 2 },
-    { from: 'B', to: 'C', w: 1 },
-    { from: 'B', to: 'D', w: 5 },
-    { from: 'C', to: 'D', w: 8 },
-    { from: 'C', to: 'E', w: 10 },
-    { from: 'D', to: 'E', w: 2 }
-  ];
+  const adjList = edges.map(e => ({ from: e.from, to: e.to, w: e.weight }));
 
-  const dist: Record<string, number> = { A: 0, B: Infinity, C: Infinity, D: Infinity, E: Infinity };
-  const parent: Record<string, string | null> = { A: null, B: null, C: null, D: null, E: null };
+  const startNode = nodes[0]?.id || 'A';
+  const dist: Record<string, number> = {};
+  const parent: Record<string, string | null> = {};
+  for (const node of nodes) {
+    dist[node.id] = node.id === startNode ? 0 : Infinity;
+    parent[node.id] = null;
+  }
   const visited = new Set<string>();
+
 
   const getDistString = () => {
     return Object.entries(dist)
@@ -253,7 +282,7 @@ export function generateDijkstraSnapshots(): AlgorithmSnapshot[] {
     });
   };
 
-  addSnapshot(1, "Inizializzazione: impostiamo la distanza sorgente dist[A] = 0 e dist[altri] = ∞.", null);
+  addSnapshot(1, `Inizializzazione: impostiamo la distanza sorgente dist[${startNode}] = 0 e dist[altri] = ∞.`, null);
 
   while (visited.size < nodes.length) {
     // Extract min distance node
@@ -307,7 +336,7 @@ export function generateDijkstraSnapshots(): AlgorithmSnapshot[] {
     }
   }
 
-  addSnapshot(11, `Dijkstra terminato. Calcolati tutti i cammini minimi dalla sorgente A.`, null);
+  addSnapshot(11, `Dijkstra terminato. Calcolati tutti i cammini minimi dalla sorgente ${startNode}.`, null);
 
   return snapshots;
 }
@@ -345,17 +374,23 @@ export const bellmanFordDefinition: AlgorithmDefinition = {
   ]
 };
 
-export function generateBellmanFordSnapshots(): AlgorithmSnapshot[] {
+export function generateBellmanFordSnapshots(customEdges?: {from: string, to: string, weight: number}[]): AlgorithmSnapshot[] {
   const snapshots: AlgorithmSnapshot[] = [];
-  const nodes = defaultNodes();
-  const edges = defaultEdges();
+  const { nodes, edges: bfEdges } = prepareGraph(customEdges);
 
-  // For Bellman-Ford, let's inject a negative weight on edge B-D to show its capability!
-  const bfEdges = defaultEdges();
-  bfEdges.find(e => e.from === 'B' && e.to === 'D')!.weight = -2; // B-D weight is -2
+  if (!customEdges) {
+    // For Bellman-Ford default graph, let's inject a negative weight on edge B-D to show its capability!
+    bfEdges.find(e => e.from === 'B' && e.to === 'D')!.weight = -2; // B-D weight is -2
+  }
 
-  const dist: Record<string, number> = { A: 0, B: Infinity, C: Infinity, D: Infinity, E: Infinity };
-  const parent: Record<string, string | null> = { A: null, B: null, C: null, D: null, E: null };
+  const startNode = nodes[0]?.id || 'A';
+  const dist: Record<string, number> = {};
+  const parent: Record<string, string | null> = {};
+  for (const node of nodes) {
+    dist[node.id] = node.id === startNode ? 0 : Infinity;
+    parent[node.id] = null;
+  }
+
 
   const getDistString = () => {
     return Object.entries(dist)
@@ -399,7 +434,7 @@ export function generateBellmanFordSnapshots(): AlgorithmSnapshot[] {
     });
   };
 
-  addSnapshot(1, "Inizializzazione: dist[A] = 0 e dist[altri] = ∞. Inietteremo un peso negativo -2 sull'arco B-D.", null);
+  addSnapshot(1, `Inizializzazione: dist[${startNode}] = 0 e dist[altri] = ∞.`, null);
 
   const V = nodes.length;
 
@@ -497,13 +532,14 @@ export const mstDefinition: AlgorithmDefinition = {
   ]
 };
 
-export function generateMstSnapshots(): AlgorithmSnapshot[] {
+export function generateMstSnapshots(customEdges?: {from: string, to: string, weight: number}[]): AlgorithmSnapshot[] {
   const snapshots: AlgorithmSnapshot[] = [];
-  const nodes = defaultNodes();
-  const edges = defaultEdges();
+  const { nodes, edges } = prepareGraph(customEdges);
 
-  const visited = new Set<string>(['A']);
+  const startNode = nodes[0]?.id || 'A';
+  const visited = new Set<string>([startNode]);
   const mstEdges: Array<{ from: string; to: string }> = [];
+
 
   const addSnapshot = (
     codeLine: number,
@@ -541,7 +577,7 @@ export function generateMstSnapshots(): AlgorithmSnapshot[] {
     });
   };
 
-  addSnapshot(1, "Inizio Algoritmo di Prim. Inseriamo il nodo sorgente A nell'albero MST.", null);
+  addSnapshot(1, `Inizio Algoritmo di Prim. Inseriamo il nodo sorgente ${startNode} nell'albero MST.`, null);
 
   while (visited.size < nodes.length) {
     let minW = Infinity;

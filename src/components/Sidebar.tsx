@@ -10,13 +10,23 @@ interface SidebarProps {
 }
 
 export default function Sidebar({ selectedAlgoId, onSelectAlgo, isOpen, setIsOpen }: SidebarProps) {
+  const getModuleColorClass = (index: number) => {
+    switch (index) {
+      case 0: return "text-emerald-600";
+      case 1: return "text-cyan-600";
+      case 2: return "text-indigo-500";
+      case 3: return "text-rose-500";
+      default: return "text-teal-600";
+    }
+  };
+
   // Map module index to Lucide icons for premium looks
   const getModuleIcon = (index: number) => {
     switch (index) {
-      case 0: return <BookOpen className="w-5 h-5 text-indigo-400" />;
-      case 1: return <Sparkles className="w-5 h-5 text-pink-400" />;
-      case 2: return <Code className="w-5 h-5 text-emerald-400" />;
-      case 3: return <Code className="w-5 h-5 text-blue-400" />;
+      case 0: return <BookOpen className="w-5 h-5 text-emerald-500" />;
+      case 1: return <Sparkles className="w-5 h-5 text-cyan-500" />;
+      case 2: return <Code className="w-5 h-5 text-indigo-500" />;
+      case 3: return <Code className="w-5 h-5 text-rose-500" />;
       default: return <BookOpen className="w-5 h-5 text-gray-400" />;
     }
   };
@@ -26,7 +36,7 @@ export default function Sidebar({ selectedAlgoId, onSelectAlgo, isOpen, setIsOpe
       {/* Mobile Toggle Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="lg:hidden fixed top-4 left-4 z-50 p-2.5 rounded-xl bg-slate-900/80 border border-slate-700/50 text-white backdrop-blur-md cursor-pointer hover:bg-slate-800 transition"
+        className="lg:hidden fixed top-4 left-4 z-50 p-2.5 rounded-xl bg-white/80 border border-emerald-200 text-emerald-950 backdrop-blur-md cursor-pointer hover:bg-emerald-50 transition"
       >
         {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
       </button>
@@ -46,16 +56,16 @@ export default function Sidebar({ selectedAlgoId, onSelectAlgo, isOpen, setIsOpe
         } lg:static lg:h-screen`}
       >
         {/* Sidebar Header */}
-        <div className="p-6 border-b border-white/5 flex flex-col gap-2">
+        <div className="p-6 border-b border-emerald-500/10 flex flex-col gap-2">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-500 via-teal-500 to-emerald-400 flex items-center justify-center shadow-lg shadow-emerald-500/30">
               <span className="font-bold text-white text-sm">AG</span>
             </div>
             <div>
-              <h1 className="font-bold text-lg leading-none bg-gradient-to-r from-white via-indigo-200 to-purple-400 bg-clip-text text-transparent">
+              <h1 className="font-bold text-lg leading-none bg-gradient-to-r from-emerald-950 via-emerald-800 to-teal-700 bg-clip-text text-transparent">
                 Antigravity Algo
               </h1>
-              <p className="text-xs text-indigo-400/80 mt-1 font-semibold tracking-wider uppercase">
+              <p className="text-xs text-emerald-600/80 mt-1 font-semibold tracking-wider uppercase">
                 Progettazione Algoritmi
               </p>
             </div>
@@ -66,7 +76,7 @@ export default function Sidebar({ selectedAlgoId, onSelectAlgo, isOpen, setIsOpe
         <div className="flex-1 overflow-y-auto px-4 py-6 space-y-8 select-none">
           {MODULES.map((module, mIdx) => (
             <div key={module.name} className="space-y-3">
-              <div className="flex items-center gap-2 px-2 text-xs font-bold uppercase tracking-wider text-slate-400">
+              <div className={`flex items-center gap-2 px-2 text-xs font-bold uppercase tracking-wider ${getModuleColorClass(mIdx)}`}>
                 {getModuleIcon(mIdx)}
                 <span>{module.name}</span>
               </div>
@@ -85,19 +95,19 @@ export default function Sidebar({ selectedAlgoId, onSelectAlgo, isOpen, setIsOpe
                         disabled={!algo.implemented}
                         className={`w-full text-left px-3 py-2.5 rounded-xl flex items-center justify-between transition-all ${
                           isSelected
-                            ? 'bg-gradient-to-r from-indigo-600/30 to-purple-600/20 border border-indigo-500/40 text-white shadow-md shadow-indigo-950/30'
+                            ? 'bg-gradient-to-r from-emerald-500/20 to-teal-500/10 border border-emerald-500/30 text-emerald-900 shadow-sm shadow-emerald-900/5'
                             : algo.implemented
-                            ? 'text-slate-300 hover:bg-white/5 border border-transparent hover:text-white cursor-pointer'
-                            : 'text-slate-600 border border-transparent cursor-not-allowed'
+                            ? 'text-teal-700 hover:bg-emerald-500/10 border border-transparent hover:text-emerald-900 cursor-pointer'
+                            : 'text-teal-500 border border-transparent cursor-not-allowed'
                         }`}
                       >
                         <span className="text-sm font-medium">{algo.name}</span>
                         {algo.implemented ? (
                           isSelected && (
-                            <CheckCircle2 className="w-4 h-4 text-indigo-400 shrink-0" />
+                            <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
                           )
                         ) : (
-                          <div className="flex items-center gap-1 text-[10px] font-semibold bg-slate-900/80 border border-white/5 text-slate-500 px-1.5 py-0.5 rounded-md uppercase tracking-tight">
+                          <div className="flex items-center gap-1 text-[10px] font-semibold bg-teal-100 border border-emerald-500/5 text-teal-600 px-1.5 py-0.5 rounded-md uppercase tracking-tight">
                             <Lock className="w-2.5 h-2.5" />
                             <span>Syllabus</span>
                           </div>
@@ -112,11 +122,11 @@ export default function Sidebar({ selectedAlgoId, onSelectAlgo, isOpen, setIsOpe
         </div>
 
         {/* Sidebar Footer */}
-        <div className="p-4 border-t border-white/5 bg-slate-950/20 text-center">
-          <p className="text-[10px] text-slate-500">
+        <div className="p-4 border-t border-emerald-500/10 bg-emerald-50/50 text-center">
+          <p className="text-[10px] text-teal-600">
             Corso di Laurea in Informatica
           </p>
-          <p className="text-[10px] text-indigo-400/60 font-medium mt-0.5">
+          <p className="text-[10px] text-emerald-600/60 font-medium mt-0.5">
             Docente: Prof. AI Antigravity
           </p>
         </div>

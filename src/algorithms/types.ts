@@ -57,6 +57,8 @@ export interface AlgorithmSnapshot {
   colLabels?: string[];
   activeRow?: number | null;
   activeCol?: number | null;
+  gridPath?: {r: number, c: number}[];
+  selectedRows?: number[];
 
   // Graph Mode (BFS/DFS, Dijkstra, Bellman-Ford, Prim, Kruskal)
   nodes?: VisualGraphNode[];

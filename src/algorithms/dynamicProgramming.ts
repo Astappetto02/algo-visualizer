@@ -121,11 +121,13 @@ export const weightedIntervalsDefinition: AlgorithmDefinition = {
   ]
 };
 
-export function generateWeightedIntervalsSnapshots(): AlgorithmSnapshot[] {
+export function generateWeightedIntervalsSnapshots(
+  customIntervals?: { start: number; end: number; weight: number }[]
+): AlgorithmSnapshot[] {
   const snapshots: AlgorithmSnapshot[] = [];
   
   // Static set of weighted intervals sorted by end time
-  const srcIntervals = [
+  let srcIntervals = [
     { id: 'I1', start: 1, end: 4, weight: 3, status: 'standard' as const },
     { id: 'I2', start: 3, end: 5, weight: 2, status: 'standard' as const },
     { id: 'I3', start: 0, end: 6, weight: 4, status: 'standard' as const },
@@ -133,6 +135,19 @@ export function generateWeightedIntervalsSnapshots(): AlgorithmSnapshot[] {
     { id: 'I5', start: 5, end: 9, weight: 6, status: 'standard' as const },
     { id: 'I6', start: 8, end: 10, weight: 3, status: 'standard' as const }
   ];
+
+  if (customIntervals && customIntervals.length > 0) {
+    srcIntervals = customIntervals
+      .map((inv, idx) => ({
+        id: `I${idx + 1}`,
+        start: inv.start,
+        end: inv.end,
+        weight: inv.weight,
+        status: 'standard' as const
+      }))
+      .sort((a, b) => a.end - b.end);
+  }
+
 
   const n = srcIntervals.length;
   // Compute p[j] (highest index i < j such that interval i is compatible with j)
@@ -306,19 +321,38 @@ export const sequenceAlignmentDefinition: AlgorithmDefinition = {
 
 export function generateSequenceAlignmentSnapshots(
   X: string = "AGAT",
-  Y: string = "GATT"
+  Y: string = "GATT",
+  costs?: {
+    vvMatch: number;
+    vvMismatch: number;
+    vcMismatch: number;
+    ccMatch: number;
+    ccMismatch: number;
+    gap: number;
+  }
 ): AlgorithmSnapshot[] {
   const snapshots: AlgorithmSnapshot[] = [];
   const m = X.length;
   const n = Y.length;
 
-  const GAP = 1;
-  const MISMATCH = 2;
+  const GAP = costs ? costs.gap : 1;
+  const isVowel = (c: string) => /^[aeiou]$/i.test(c);
+
+  const getMatchScore = (c1: string, c2: string) => {
+    if (!costs) return c1 === c2 ? 0 : 2; // Default MISMATCH = 2, MATCH = 0
+    const v1 = isVowel(c1);
+    const v2 = isVowel(c2);
+    const match = c1 === c2;
+    if (v1 && v2) return match ? costs.vvMatch : costs.vvMismatch;
+    if (!v1 && !v2) return match ? costs.ccMatch : costs.ccMismatch;
+    return costs.vcMismatch; // Vowel-Consonant
+  };
 
   // Initialize (m+1) x (n+1) grid
   const dp: number[][] = Array(m + 1)
     .fill(null)
     .map(() => Array(n + 1).fill(0));
+
 
   const rowLabels = ['-', ...X.split('')];
   const colLabels = ['-', ...Y.split('')];
@@ -347,7 +381,7 @@ export function generateSequenceAlignmentSnapshots(
     });
   };
 
-  addSnapshot(1, `Allineamento globale tra X = "${X}" e Y = "${Y}". Penalità: Gap = ${GAP}, Mismatch = ${MISMATCH}.`, 0, 0);
+  addSnapshot(1, `Allineamento globale tra X = "${X}" e Y = "${Y}". Penalità Gap = ${GAP}. I costi di match/mismatch variano in base al tipo di carattere.`, 0, 0);
 
   // Initialize Gap columns
   for (let i = 0; i <= m; i++) {
@@ -364,14 +398,16 @@ export function generateSequenceAlignmentSnapshots(
   // Double loop
   for (let i = 1; i <= m; i++) {
     for (let j = 1; j <= n; j++) {
-      const matchScore = X[i - 1] === Y[j - 1] ? 0 : MISMATCH;
+      const charX = X[i - 1];
+      const charY = Y[j - 1];
+      const matchScore = getMatchScore(charX, charY);
+      
       const match = dp[i - 1][j - 1] + matchScore;
       const del = dp[i - 1][j] + GAP;
       const ins = dp[i][j - 1] + GAP;
       
-      const charX = X[i - 1];
-      const charY = Y[j - 1];
       const eq = charX === charY;
+
 
       addSnapshot(
         8,
@@ -432,7 +468,12 @@ export const knapsackDefinition: AlgorithmDefinition = {
     '                dp[i][w] = max(val + dp[i-1][w-wt], dp[i-1][w])',
     '            else',
     '                dp[i][w] = dp[i-1][w]',
-    '    return dp[n][W]'
+    '    currW = W, selected = []',
+    '    for i = n down to 1',
+    '        if dp[i][currW] != dp[i-1][currW]',
+    '            selected.push(items[i-1])',
+    '            currW = currW - items[i-1].wt',
+    '    return dp[n][W], selected'
   ]
 };
 
@@ -470,7 +511,9 @@ export function generateKnapsackSnapshots(
     description: string,
     activeRow: number | null,
     activeCol: number | null,
-    variables: Record<string, any> = {}
+    variables: Record<string, any> = {},
+    gridPath?: {r: number, c: number}[],
+    selectedRows?: number[]
   ) => {
     snapshots.push({
       grid: dp.map(row => [...row]),
@@ -478,6 +521,8 @@ export function generateKnapsackSnapshots(
       colLabels,
       activeRow,
       activeCol,
+      gridPath: gridPath ? [...gridPath] : undefined,
+      selectedRows: selectedRows ? [...selectedRows] : undefined,
       codeLine,
       description,
       variables: {
@@ -529,31 +574,51 @@ export function generateKnapsackSnapshots(
 
   // Backtracking to find selection
   const selected: string[] = [];
+  const selectedRows: number[] = [];
   let currW = W;
-  addSnapshot(12, `Profitto massimo calcolato: ${dp[n][W]}. Avviamo il backtracking per trovare gli oggetti selezionati.`, n, W);
+  const path: {r: number, c: number}[] = [{r: n, c: W}];
+  addSnapshot(13, `Profitto massimo calcolato: ${dp[n][W]}. Avviamo il backtracking per trovare gli oggetti selezionati.`, n, W, {}, path, selectedRows);
 
   for (let i = n; i > 0; i--) {
+    addSnapshot(14, `Verifichiamo riga ${i}, colonna ${currW}.`, i, currW, { i, w: currW }, path, selectedRows);
     if (dp[i][currW] !== dp[i - 1][currW]) {
       const item = items[i - 1];
       selected.push(item.name);
+      selectedRows.push(i); // Mark row as selected
       addSnapshot(
-        12,
-        `Rilevato cambio di valore dp[${i}][${currW}] (${dp[i][currW]}) != dp[${i-1}][${currW}] (${dp[i-1][currW]}). L'oggetto ${item.name} è stato incluso nello zaino. Riducendo capacità rimasta w = w - wt = ${currW - item.weight}.`,
+        16,
+        `Rilevato cambio di valore dp[${i}][${currW}] (${dp[i][currW]}) != dp[${i-1}][${currW}] (${dp[i-1][currW]}). L'oggetto ${item.name} è stato incluso nello zaino.`,
         i, currW,
-        { i, w: currW, preso: item.name }
+        { i, w: currW, preso: item.name },
+        path,
+        selectedRows
       );
       currW -= item.weight;
-    } else {
+      path.push({r: i - 1, c: currW});
       addSnapshot(
-        12,
-        `Valore dp[${i}][${currW}] (${dp[i][currW]}) invariato rispetto a dp[${i-1}][${currW}]. Oggetto ${items[i-1].name} escluso.`,
-        i, currW,
-        { i, w: currW, escluso: items[i-1].name }
+        17,
+        `Riduciamo la capacità residua a w = ${currW} e passiamo alla riga precedente.`,
+        i - 1, currW,
+        { i: i - 1, w: currW },
+        path,
+        selectedRows
+      );
+    } else {
+      path.push({r: i - 1, c: currW});
+      addSnapshot(
+        15,
+        `Valore dp[${i}][${currW}] (${dp[i][currW]}) invariato rispetto a dp[${i-1}][${currW}]. Oggetto ${items[i-1].name} escluso. Saliamo di una riga.`,
+        i - 1, currW,
+        { i: i - 1, w: currW, escluso: items[i-1].name },
+        path,
+        selectedRows
       );
     }
   }
+  
+  addSnapshot(18, `Ricerca terminata. Oggetti finali inclusi: ${selected.length > 0 ? selected.join(', ') : 'Nessuno'}.`, 0, currW, { selezionati: selected.join(', ') }, path, selectedRows);
 
-  addSnapshot(12, `Backtracking terminato. Gli oggetti che massimizzano il profitto sono: ${selected.reverse().join(', ')}.`, null, null, { "Soluzione Ottima": selected.join(', '), profitto_totale: dp[n][W] });
+  addSnapshot(12, `Backtracking terminato. Gli oggetti che massimizzano il profitto sono: ${selected.reverse().join(', ')}.`, null, null, { "Soluzione Ottima": selected.join(', '), profitto_totale: dp[n][W] }, undefined, selectedRows);
 
   return snapshots;
 }

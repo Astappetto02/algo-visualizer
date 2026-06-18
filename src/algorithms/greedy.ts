@@ -37,11 +37,13 @@ export const intervalSchedulingDefinition: AlgorithmDefinition = {
   ]
 };
 
-export function generateIntervalSchedulingSnapshots(): AlgorithmSnapshot[] {
+export function generateIntervalSchedulingSnapshots(
+  customIntervals?: { start: number; end: number }[]
+): AlgorithmSnapshot[] {
   const snapshots: AlgorithmSnapshot[] = [];
   
   // Set of intervals
-  const srcIntervals = [
+  let srcIntervals = [
     { id: 'I1', start: 1, end: 3, status: 'standard' as const },
     { id: 'I2', start: 2, end: 5, status: 'standard' as const },
     { id: 'I3', start: 3, end: 6, status: 'standard' as const },
@@ -49,6 +51,18 @@ export function generateIntervalSchedulingSnapshots(): AlgorithmSnapshot[] {
     { id: 'I5', start: 6, end: 8, status: 'standard' as const },
     { id: 'I6', start: 7, end: 9, status: 'standard' as const }
   ];
+
+  if (customIntervals && customIntervals.length > 0) {
+    srcIntervals = customIntervals
+      .map((inv, idx) => ({
+        id: `I${idx + 1}`,
+        start: inv.start,
+        end: inv.end,
+        status: 'standard' as const
+      }))
+      .sort((a, b) => a.end - b.end);
+  }
+
 
   const intervalsState = (): VisualInterval[] => srcIntervals.map(inv => ({ ...inv }));
 
@@ -153,18 +167,37 @@ export const huffmanDefinition: AlgorithmDefinition = {
   ]
 };
 
-export function generateHuffmanSnapshots(): AlgorithmSnapshot[] {
+export function generateHuffmanSnapshots(customText?: string): AlgorithmSnapshot[] {
   const snapshots: AlgorithmSnapshot[] = [];
   
-  // Starting alphabet
-  const initialNodes: Array<{ id: string; label: string; freq: number }> = [
-    { id: 'A', label: 'A:45', freq: 45 },
-    { id: 'B', label: 'B:13', freq: 13 },
-    { id: 'C', label: 'C:12', freq: 12 },
-    { id: 'D', label: 'D:16', freq: 16 },
-    { id: 'E', label: 'E:9', freq: 9 },
-    { id: 'F', label: 'F:5', freq: 5 }
-  ];
+  let initialNodes: Array<{ id: string; label: string; freq: number }> = [];
+
+  if (customText && customText.trim().length > 0) {
+    // Compute frequencies
+    const text = customText.trim().toUpperCase();
+    const freqMap: Record<string, number> = {};
+    for (const char of text) {
+      if (char !== ' ') {
+        freqMap[char] = (freqMap[char] || 0) + 1;
+      }
+    }
+    initialNodes = Object.keys(freqMap).map(char => ({
+      id: char,
+      label: `${char}:${freqMap[char]}`,
+      freq: freqMap[char]
+    }));
+  } else {
+    // Starting alphabet
+    initialNodes = [
+      { id: 'A', label: 'A:45', freq: 45 },
+      { id: 'B', label: 'B:13', freq: 13 },
+      { id: 'C', label: 'C:12', freq: 12 },
+      { id: 'D', label: 'D:16', freq: 16 },
+      { id: 'E', label: 'E:9', freq: 9 },
+      { id: 'F', label: 'F:5', freq: 5 }
+    ];
+  }
+
 
   // Helper to compute node layout positions dynamically based on connections
   // We represent the tree as a flat array of nodes with coordinates
@@ -260,7 +293,7 @@ function layoutForest(nodes: VisualTreeNode[]): VisualTreeNode[] {
   const roots = list.filter(n => !n.parentId);
   
   // Arrange roots spread out horizontally
-  const screenWidth = 550;
+  const screenWidth = Math.max(550, list.length * 35);
   roots.forEach((root, idx) => {
     const rootX = ((idx + 1) * screenWidth) / (roots.length + 1);
     root.x = rootX;

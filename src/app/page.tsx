@@ -5,7 +5,8 @@ import Sidebar from '../components/Sidebar';
 import VisualizerCanvas from '../components/VisualizerCanvas';
 import ControlPanel from '../components/ControlPanel';
 import InputPanel from '../components/InputPanel';
-import CodePanel from '../components/CodePanel';
+import ExecutionPanel from '../components/ExecutionPanel';
+import AnalysisPanel from '../components/AnalysisPanel';
 import { useAlgorithmRunner } from '../hooks/useAlgorithmRunner';
 import { ALGORITHMS } from '../algorithms';
 import { Sparkles, HelpCircle, GraduationCap } from 'lucide-react';
@@ -33,9 +34,26 @@ import {
 
 export default function Home() {
   const [selectedAlgoId, setSelectedAlgoId] = useState<string>('mergesort');
-  const [array, setArray] = useState<number[]>([42, 15, 88, 56, 7, 23, 61, 39]);
-  const [target, setTarget] = useState<number>(23);
+  const [config, setConfig] = useState({
+    array: [42, 15, 88, 56, 7, 23, 61, 39],
+    target: 23,
+    string1: "AGAT",
+    string2: "GATT",
+    seqCosts: {
+      vvMatch: 0,
+      vvMismatch: 2,
+      vcMismatch: 2,
+      ccMatch: 0,
+      ccMismatch: 2,
+      gap: 1
+    },
+    huffmanText: "ABRACADABRA",
+    customIntervalsText: "1,3,10\n2,5,20\n3,6,15\n5,7,12",
+    customEdgesText: "A,B,4\nA,C,2\nB,C,1\nB,D,5\nC,D,8\nC,E,10\nD,E,2",
+    customKnapsackText: "O1,2,3\nO2,3,4\nO3,4,5\nO4,5,8"
+  });
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
+
   const [mounted, setMounted] = useState<boolean>(false);
 
   useEffect(() => {
@@ -50,49 +68,79 @@ export default function Home() {
   // Adjust target default value based on algorithm selection to make it educational
   useEffect(() => {
     if (selectedAlgoId === 'fibonacci') {
-      setTarget(8); // Default N = 8
+      setConfig(prev => ({ ...prev, target: 8 }));
     } else if (selectedAlgoId === 'knapsack') {
-      setTarget(6); // Default Capacity W = 6
+      setConfig(prev => ({ ...prev, target: 6 }));
     } else if (selectedAlgoId === 'binarysearch') {
-      setTarget(23); // Default search target = 23
+      setConfig(prev => ({ ...prev, target: 23 }));
     }
   }, [selectedAlgoId]);
+
+  const parseIntervals = (text: string) => {
+    return text.split('\n').map(line => {
+      const parts = line.split(',').map(p => parseInt(p.trim()));
+      if (parts.length >= 2 && !isNaN(parts[0]) && !isNaN(parts[1])) {
+        return { start: parts[0], end: parts[1], weight: parts[2] || 1 };
+      }
+      return null;
+    }).filter(Boolean) as { start: number, end: number, weight: number }[];
+  };
+
+  const parseEdges = (text: string) => {
+    return text.split('\n').map(line => {
+      const parts = line.split(',').map(p => p.trim());
+      if (parts.length >= 2 && parts[0] && parts[1]) {
+        return { from: parts[0], to: parts[1], weight: parseInt(parts[2]) || 1 };
+      }
+      return null;
+    }).filter(Boolean) as { from: string, to: string, weight: number }[];
+  };
+
+  const parseKnapsackItems = (text: string) => {
+    return text.split('\n').map(line => {
+      const parts = line.split(',').map(p => p.trim());
+      if (parts.length >= 3 && parts[0] && !isNaN(parseInt(parts[1])) && !isNaN(parseInt(parts[2]))) {
+        return { name: parts[0], weight: parseInt(parts[1]), value: parseInt(parts[2]) };
+      }
+      return null;
+    }).filter(Boolean) as { name: string, weight: number, value: number }[];
+  };
 
   // Generate snapshots on selected algorithm / array / target updates
   const snapshots = useMemo(() => {
     switch (selectedAlgoId) {
       case 'mergesort':
-        return generateMergeSortSnapshots(array);
+        return generateMergeSortSnapshots(config.array);
       case 'binarysearch':
-        return generateBinarySearchSnapshots(array, target);
+        return generateBinarySearchSnapshots(config.array, config.target);
       case 'quicksort':
-        return generateQuickSortSnapshots(array);
+        return generateQuickSortSnapshots(config.array);
       case 'fibonacci':
-        const fibN = Math.max(2, Math.min(target, 10)); // keep between 2 and 10
+        const fibN = Math.max(2, Math.min(config.target, 10)); // keep between 2 and 10
         return generateFibonacciSnapshots(fibN);
       case 'weightedintervals':
-        return generateWeightedIntervalsSnapshots();
+        return generateWeightedIntervalsSnapshots(parseIntervals(config.customIntervalsText));
       case 'sequencealignment':
-        return generateSequenceAlignmentSnapshots("AGAT", "GATT");
+        return generateSequenceAlignmentSnapshots(config.string1, config.string2, config.seqCosts);
       case 'knapsack':
-        const capW = Math.max(2, Math.min(target, 10)); // keep capacity reasonable
-        return generateKnapsackSnapshots(capW);
+        const capW = Math.max(2, Math.min(config.target, 25)); // keep capacity reasonable
+        return generateKnapsackSnapshots(capW, parseKnapsackItems(config.customKnapsackText));
       case 'intervalscheduling':
-        return generateIntervalSchedulingSnapshots();
+        return generateIntervalSchedulingSnapshots(parseIntervals(config.customIntervalsText));
       case 'huffman':
-        return generateHuffmanSnapshots();
+        return generateHuffmanSnapshots(config.huffmanText);
       case 'bfsdfs':
-        return generateBfsDfsSnapshots(true); // Default to BFS
+        return generateBfsDfsSnapshots(true, parseEdges(config.customEdgesText)); // Default to BFS
       case 'dijkstra':
-        return generateDijkstraSnapshots();
+        return generateDijkstraSnapshots(parseEdges(config.customEdgesText));
       case 'bellmanford':
-        return generateBellmanFordSnapshots();
+        return generateBellmanFordSnapshots(parseEdges(config.customEdgesText));
       case 'mst':
-        return generateMstSnapshots();
+        return generateMstSnapshots(parseEdges(config.customEdgesText));
       default:
         return [];
     }
-  }, [selectedAlgoId, array, target]);
+  }, [selectedAlgoId, config]);
 
   // Connect the hooks algorithm runner
   const {
@@ -109,33 +157,19 @@ export default function Home() {
     goToStep
   } = useAlgorithmRunner(snapshots);
 
-  const handleArraySubmit = (newArray: number[]) => {
-    setArray(newArray);
-  };
-
-  const showTargetInput = ['binarysearch', 'fibonacci', 'knapsack'].includes(selectedAlgoId);
-
-  const targetLabel = useMemo(() => {
-    if (selectedAlgoId === 'fibonacci') return 'Valore N da Calcolare (F(N))';
-    if (selectedAlgoId === 'knapsack') return 'Capacità dello Zaino (W)';
-    return 'Valore Target da Cercare';
-  }, [selectedAlgoId]);
-
-  const showArrayInput = ['mergesort', 'binarysearch', 'quicksort'].includes(selectedAlgoId);
-
   if (!mounted) {
     return (
-      <div className="flex h-screen w-screen items-center justify-center bg-bg-dark text-slate-400 font-semibold font-sans">
+      <div className="flex h-screen w-screen items-center justify-center bg-emerald-50 text-emerald-700 font-semibold font-sans">
         <div className="flex flex-col items-center gap-3">
-          <div className="w-8 h-8 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
-          <p className="text-xs tracking-wider uppercase font-bold text-slate-500">Inizializzazione Corso...</p>
+          <div className="w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+          <p className="text-xs tracking-wider uppercase font-bold text-teal-600">Inizializzazione Corso...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-bg-dark text-foreground">
+    <div className="flex h-screen w-screen overflow-hidden bg-emerald-50/50 text-foreground">
       {/* Sidebar for choosing algorithms */}
       <Sidebar
         selectedAlgoId={selectedAlgoId}
@@ -147,39 +181,22 @@ export default function Home() {
       {/* Main dashboard content area */}
       <main className="flex-1 flex flex-col h-full overflow-y-auto relative p-6 lg:p-8 pt-20 lg:pt-8 gap-6">
         
-        {/* Dashboard Top Header Bar */}
-        <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/5 pb-5">
-          <div>
-            <div className="flex items-center gap-2">
-              <GraduationCap className="w-5 h-5 text-indigo-400" />
-              <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">
-                Dashboard Didattica
-              </span>
-            </div>
-            <h2 className="text-2xl font-bold text-white mt-0.5 tracking-tight flex items-center gap-2">
-              Visualizzatore Algoritmi Universitario
-              <Sparkles className="w-5 h-5 text-indigo-400 fill-indigo-400/20" />
-            </h2>
-          </div>
 
-          <div className="flex items-center gap-3 bg-slate-900/60 border border-white/5 px-4 py-2 rounded-xl text-xs text-slate-400 select-none">
-            <HelpCircle className="w-4 h-4 text-indigo-400 shrink-0" />
-            <span>Seleziona un algoritmo nella sidebar per caricare il modulo didattico.</span>
-          </div>
-        </header>
 
         {/* Algorithm Description Area */}
         {algoDefinition && (
-          <div className="bg-gradient-to-r from-indigo-950/20 via-purple-950/10 to-transparent p-5 rounded-2xl border border-indigo-500/10 flex flex-col gap-1 shadow-lg">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-400">
+          <div className="bg-gradient-to-r from-emerald-100/70 via-teal-50/50 to-transparent p-6 rounded-2xl border border-emerald-200 flex flex-col gap-2 shadow-sm">
+            <span className="text-xs font-bold uppercase tracking-wider text-emerald-700">
               Syllabus Informatica - Modulo: {algoDefinition.module}
             </span>
-            <h3 className="text-lg font-bold text-white tracking-tight">
+            <h3 className="text-xl font-bold text-emerald-950 tracking-tight">
               {algoDefinition.name}
             </h3>
-            <p className="text-xs text-slate-400 leading-relaxed max-w-4xl mt-1.5 font-medium">
-              {algoDefinition.description}
-            </p>
+            <div className="bg-amber-50/50 p-4 rounded-xl border border-amber-100 mt-1">
+              <p className="text-sm text-slate-800 leading-7 font-medium max-w-5xl">
+                {algoDefinition.description}
+              </p>
+            </div>
           </div>
         )}
 
@@ -203,30 +220,31 @@ export default function Home() {
               onSpeedChange={setSpeed}
               onGoToStep={goToStep}
             />
-          </div>
-
-          {/* Configuration and Code Inspector Sidebar Panel (Takes 1/4 widths) */}
-          <div className="flex flex-col gap-6 w-full">
-            {/* Input Configurator (Hide array input for graphs/static algorithms) */}
-            {(showArrayInput || showTargetInput) && (
-              <InputPanel
-                initialArray={array}
-                onArraySubmit={handleArraySubmit}
-                showTargetInput={showTargetInput}
-                targetValue={target}
-                onTargetChange={setTarget}
-                targetLabel={targetLabel}
+            
+            {/* Analysis and Variants Panel moved here for more horizontal space */}
+            {algoDefinition && (
+              <AnalysisPanel
+                complexity={algoDefinition.complexity}
+                variants={algoDefinition.variants}
               />
             )}
-            
-            {/* Realtime Pseudocode panel */}
+          </div>
+
+          {/* Configuration Sidebar Panel (Takes 1/4 widths) */}
+          <div className="flex flex-col gap-6 w-full">
+            {/* Input Configurator */}
+            <InputPanel
+              algoId={selectedAlgoId}
+              config={config}
+              onConfigChange={setConfig}
+            />
+
+            {/* Execution panel back in sidebar */}
             {algoDefinition && (
-              <CodePanel
+              <ExecutionPanel
                 pseudocode={algoDefinition.pseudocode}
                 activeLine={currentSnapshot ? currentSnapshot.codeLine : -1}
                 variables={currentSnapshot ? currentSnapshot.variables : {}}
-                complexity={algoDefinition.complexity}
-                variants={algoDefinition.variants}
               />
             )}
           </div>
