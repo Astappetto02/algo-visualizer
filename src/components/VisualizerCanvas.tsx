@@ -77,17 +77,17 @@ export default function VisualizerCanvas({ snapshot, activeAlgoId }: VisualizerC
                 const maxVal = Math.max(...array, 10);
                 const heightPct = `${Math.max(12, (value / maxVal) * 85)}%`;
 
-                let barBg = 'bg-gradient-to-t from-emerald-100 to-emerald-400 border-emerald-300';
-                let textColor = 'text-emerald-800';
+                let barBg = 'bg-gradient-to-t from-teal-100 to-teal-300 border-teal-300';
+                let textColor = 'text-teal-700';
                 let shadow = '';
 
                 if (isActive) {
-                  barBg = 'bg-gradient-to-t from-cyan-100 to-cyan-400 border-cyan-400 animate-pulse';
-                  textColor = 'text-cyan-700 font-bold';
-                  shadow = 'shadow-[0_0_15px_rgba(6,182,212,0.4)]';
+                  barBg = 'bg-gradient-to-t from-rose-300 to-rose-500 border-rose-400 animate-pulse';
+                  textColor = 'text-rose-700 font-bold';
+                  shadow = 'shadow-[0_0_15px_rgba(244,63,94,0.5)]';
                 } else if (isMerged) {
-                  barBg = 'bg-gradient-to-t from-teal-200 to-teal-500 border-teal-400';
-                  textColor = 'text-teal-800';
+                  barBg = 'bg-gradient-to-t from-emerald-400 to-emerald-600 border-emerald-500';
+                  textColor = 'text-emerald-900 font-bold';
                 }
 
                 return (
@@ -102,17 +102,17 @@ export default function VisualizerCanvas({ snapshot, activeAlgoId }: VisualizerC
               })}
             </div>
             
-            <div className="flex items-center justify-between text-[11px] text-teal-700 pt-4 border-t border-emerald-500/10 font-semibold">
+            <div className="flex items-center justify-between text-[11px] text-slate-700 pt-4 border-t border-emerald-500/10 font-semibold">
               <div className="flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-sm bg-gradient-to-t from-emerald-100 to-emerald-400 border border-emerald-300" />
+                <span className="w-2.5 h-2.5 rounded-sm bg-gradient-to-t from-teal-100 to-teal-300 border border-teal-300" />
                 <span>Standard</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-sm bg-gradient-to-t from-cyan-100 to-cyan-400 border border-cyan-400 animate-pulse" />
+                <span className="w-2.5 h-2.5 rounded-sm bg-gradient-to-t from-rose-300 to-rose-500 border border-rose-400 animate-pulse" />
                 <span>Attivo / Confronto</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-sm bg-gradient-to-t from-teal-200 to-teal-500 border border-teal-400" />
+                <span className="w-2.5 h-2.5 rounded-sm bg-gradient-to-t from-emerald-400 to-emerald-600 border border-emerald-500" />
                 <span>Fissato / Ordinato</span>
               </div>
             </div>
@@ -137,20 +137,20 @@ export default function VisualizerCanvas({ snapshot, activeAlgoId }: VisualizerC
                     return (
                       <motion.div key={depth} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className={`flex justify-center items-center w-full ${isVeryCrowded ? 'gap-1' : isCrowded ? 'gap-2' : 'gap-4'}`}>
                         {depthNodes.map((node) => {
-                          let nodeStyle = 'border-emerald-200 bg-white/60 text-teal-700';
+                          let nodeStyle = 'border-teal-200 bg-white/60 text-teal-700';
                           let statusText = 'inattivo';
 
                           if (node.status === 'splitting') {
-                            nodeStyle = 'border-cyan-400 bg-cyan-50 text-cyan-700 ring-1 ring-cyan-200';
+                            nodeStyle = 'border-rose-400 bg-rose-50 text-rose-700 ring-1 ring-rose-200';
                             statusText = 'splitting';
                           } else if (node.status === 'sorting') {
-                            nodeStyle = 'border-emerald-400 bg-emerald-50 text-emerald-700';
+                            nodeStyle = 'border-indigo-400 bg-indigo-50 text-indigo-700';
                             statusText = 'ordinando';
                           } else if (node.status === 'merging') {
-                            nodeStyle = 'border-teal-400 bg-teal-50 text-teal-700 ring-2 ring-teal-200 animate-pulse';
+                            nodeStyle = 'border-fuchsia-400 bg-fuchsia-50 text-fuchsia-700 ring-2 ring-fuchsia-200 animate-pulse';
                             statusText = 'merging';
                           } else if (node.status === 'merged') {
-                            nodeStyle = 'border-emerald-600 bg-emerald-100 text-emerald-800';
+                            nodeStyle = 'border-emerald-500 bg-emerald-100 text-emerald-900 font-bold';
                             statusText = 'ordinato';
                           }
 
@@ -159,13 +159,13 @@ export default function VisualizerCanvas({ snapshot, activeAlgoId }: VisualizerC
                               <div className={`flex items-center justify-center font-mono font-bold ${isVeryCrowded ? 'text-[9px] gap-0.5' : isCrowded ? 'text-[10px] gap-0.5' : 'text-xs gap-1'}`}>
                                 {node.array.length > 0 ? (
                                   node.array.map((val, vIdx) => (
-                                    <span key={vIdx} className={node.status === 'merging' ? 'text-teal-600' : ''}>{val}</span>
+                                    <span key={vIdx} className={node.status === 'merging' ? 'text-fuchsia-600' : ''}>{val}</span>
                                   ))
                                 ) : (
                                   <span className="text-[10px] text-teal-500">vuoto</span>
                                 )}
                               </div>
-                              <span className={`${isVeryCrowded ? 'text-[6px]' : isCrowded ? 'text-[7px]' : 'text-[8px]'} font-semibold uppercase tracking-wider text-teal-600 opacity-80`}>{statusText}</span>
+                              <span className={`${isVeryCrowded ? 'text-[6px]' : isCrowded ? 'text-[7px]' : 'text-[8px]'} font-semibold uppercase tracking-wider opacity-80`}>{statusText}</span>
                             </div>
                           );
                         })}
@@ -175,12 +175,12 @@ export default function VisualizerCanvas({ snapshot, activeAlgoId }: VisualizerC
                 </AnimatePresence>
               </div>
 
-              <div className="flex items-center justify-center gap-4 text-[10px] text-teal-700 pt-4 border-t border-emerald-500/10 font-semibold">
-                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded bg-teal-400" /> Idle</span>
-                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded bg-cyan-400" /> Divide</span>
-                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded bg-emerald-400" /> Sorting</span>
-                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded bg-teal-400" /> Merging</span>
-                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded bg-emerald-600" /> Ordinato</span>
+              <div className="flex items-center justify-center gap-4 text-[10px] text-slate-700 pt-4 border-t border-emerald-500/10 font-semibold">
+                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded bg-teal-200" /> Idle</span>
+                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded bg-rose-400" /> Divide</span>
+                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded bg-indigo-400" /> Sorting</span>
+                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded bg-fuchsia-400" /> Merging</span>
+                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded bg-emerald-500" /> Ordinato</span>
               </div>
             </div>
           )}
@@ -209,7 +209,7 @@ export default function VisualizerCanvas({ snapshot, activeAlgoId }: VisualizerC
                 <th className="p-2 border border-emerald-200 bg-white/60 text-teal-600 select-none"></th>
                 {colLabels.map((col, cIdx) => (
                   <th key={cIdx} className={`p-2 border border-emerald-200 bg-white/80 font-semibold text-teal-800 min-w-[55px] ${
-                    activeCol === cIdx ? 'text-cyan-700 bg-cyan-100' : ''
+                    activeCol === cIdx ? 'text-rose-700 bg-rose-100' : ''
                   }`}>
                     {col}
                   </th>
@@ -224,9 +224,9 @@ export default function VisualizerCanvas({ snapshot, activeAlgoId }: VisualizerC
                 <tr key={rIdx} className="hover:bg-emerald-100/50 transition-colors">
                   <td className={`p-2 border border-emerald-200 font-semibold text-left select-none max-w-[140px] truncate transition-colors ${
                     activeRow === rIdx 
-                      ? 'text-cyan-700 bg-cyan-100' 
+                      ? 'text-rose-700 bg-rose-100' 
                       : isSelectedRow 
-                        ? 'text-teal-700 bg-teal-100 border-l-[3px] border-l-teal-500' 
+                        ? 'text-indigo-800 bg-indigo-100 border-l-[3px] border-l-indigo-500' 
                         : 'text-teal-700 bg-white/60'
                   }`}>
                     {rowLabels[rIdx] || `r=${rIdx}`}
@@ -239,13 +239,15 @@ export default function VisualizerCanvas({ snapshot, activeAlgoId }: VisualizerC
                     let cellBg = '';
 
                     if (isActive) {
-                      cellColor = 'text-cyan-700 font-bold';
-                      cellBg = 'bg-cyan-100 border-cyan-400 ring-2 ring-cyan-200';
+                      cellColor = 'text-rose-700 font-bold';
+                      cellBg = 'bg-rose-100 border-rose-400 ring-2 ring-rose-200';
                     } else if (isInPath) {
-                      cellColor = 'text-teal-700 font-bold';
-                      cellBg = 'bg-teal-100 border-teal-400 shadow-[0_0_10px_rgba(20,184,166,0.2)]';
+                      cellColor = 'text-emerald-900 font-bold';
+                      cellBg = 'bg-emerald-200 border-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.3)]';
                     } else if (cell !== 0) {
-                      cellColor = 'text-emerald-950 font-medium';
+                      cellColor = 'text-teal-900 font-medium';
+                    } else {
+                      cellColor = 'text-slate-400';
                     }
 
                     return (
@@ -261,11 +263,11 @@ export default function VisualizerCanvas({ snapshot, activeAlgoId }: VisualizerC
           </table>
         </div>
 
-        <div className="flex items-center gap-4 text-[10px] text-teal-600 pt-4 border-t border-emerald-500/10 font-semibold mt-4">
+        <div className="flex items-center gap-4 text-[10px] text-slate-700 pt-4 border-t border-emerald-500/10 font-semibold mt-4">
           <span className="flex items-center gap-1"><span className="w-2 h-2 rounded bg-white/60 border border-emerald-200" /> Cella Inattiva</span>
-          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded bg-cyan-100 border border-cyan-400" /> Sotto-problema Attivo</span>
-          {snapshot.gridPath && <span className="flex items-center gap-1"><span className="w-2 h-2 rounded bg-teal-100 border border-teal-400" /> Percorso Backtracking</span>}
-          {snapshot.selectedRows && <span className="flex items-center gap-1"><span className="w-2 h-2 rounded bg-teal-200 border border-teal-500" /> Oggetto Selezionato</span>}
+          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded bg-rose-100 border border-rose-400" /> Sotto-problema Attivo</span>
+          {snapshot.gridPath && <span className="flex items-center gap-1"><span className="w-2 h-2 rounded bg-emerald-200 border border-emerald-500" /> Percorso Backtracking</span>}
+          {snapshot.selectedRows && <span className="flex items-center gap-1"><span className="w-2 h-2 rounded bg-indigo-100 border border-indigo-500" /> Oggetto Selezionato</span>}
         </div>
       </div>
     );
@@ -307,17 +309,17 @@ export default function VisualizerCanvas({ snapshot, activeAlgoId }: VisualizerC
               const toNode = nodes.find(n => n.id === edge.to);
               if (!fromNode || !toNode) return null;
 
-              let stroke = 'rgba(16,185,129,0.2)';
+              let stroke = 'rgba(20,184,166,0.3)'; // Teal 500 transparent
               let strokeWidth = 1.5;
               let edgeShadow = '';
 
               if (edge.status === 'active') {
-                stroke = '#06b6d4'; // Amber active
+                stroke = '#f43f5e'; // Rose active
                 strokeWidth = 3;
               } else if (edge.status === 'path') {
-                stroke = '#0d9488'; // Teal path
+                stroke = '#10b981'; // Emerald path
                 strokeWidth = 3.5;
-                edgeShadow = 'drop-shadow(0 0 4px rgba(13,148,136,0.3))';
+                edgeShadow = 'drop-shadow(0 0 4px rgba(16,185,129,0.3))';
               }
 
               return (
@@ -334,20 +336,20 @@ export default function VisualizerCanvas({ snapshot, activeAlgoId }: VisualizerC
 
             {/* Draw Nodes */}
             {nodes.map((node) => {
-              let fill = 'fill-white stroke-emerald-300';
+              let fill = 'fill-white stroke-teal-300';
               let textFill = 'fill-teal-700';
               let glow = '';
 
               if (node.status === 'active') {
-                fill = 'fill-cyan-50 stroke-cyan-400';
-                textFill = 'fill-cyan-700 font-bold';
-                glow = 'drop-shadow(0 0 6px rgba(6,182,212,0.3))';
+                fill = 'fill-rose-50 stroke-rose-400';
+                textFill = 'fill-rose-700 font-bold';
+                glow = 'drop-shadow(0 0 6px rgba(244,63,94,0.3))';
               } else if (node.status === 'visited') {
-                fill = 'fill-teal-50 stroke-teal-500';
-                textFill = 'fill-teal-700';
+                fill = 'fill-indigo-50 stroke-indigo-400';
+                textFill = 'fill-indigo-700';
               } else if (node.status === 'path') {
                 fill = 'fill-emerald-100 stroke-emerald-600';
-                textFill = 'fill-emerald-800 font-bold';
+                textFill = 'fill-emerald-900 font-bold';
                 glow = 'drop-shadow(0 0 6px rgba(16,185,129,0.3))';
               }
 
@@ -363,10 +365,10 @@ export default function VisualizerCanvas({ snapshot, activeAlgoId }: VisualizerC
           </svg>
         </div>
 
-        <div className="flex items-center justify-between text-[10px] text-teal-600 pt-3 border-t border-emerald-500/10 font-semibold mt-2">
-          <div className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-white border border-emerald-200" /> Standard</div>
-          <div className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-teal-50 border border-teal-500" /> Frontiera / Scoperto</div>
-          <div className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-cyan-50 border border-cyan-400" /> Corrente / In esame</div>
+        <div className="flex items-center justify-between text-[10px] text-slate-700 pt-3 border-t border-emerald-500/10 font-semibold mt-2">
+          <div className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-white border border-teal-300" /> Standard</div>
+          <div className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-indigo-50 border border-indigo-400" /> Frontiera / Scoperto</div>
+          <div className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-rose-50 border border-rose-400" /> Corrente / In esame</div>
           <div className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-emerald-100 border border-emerald-600" /> Chiuso / Soluzione</div>
         </div>
       </div>
@@ -391,19 +393,19 @@ export default function VisualizerCanvas({ snapshot, activeAlgoId }: VisualizerC
             const leftPct = `${(inv.start / maxEnd) * 100}%`;
             const widthPct = `${((inv.end - inv.start) / maxEnd) * 100}%`;
 
-            let color = 'bg-white/80 border-emerald-200 text-teal-700';
+            let color = 'bg-white/80 border-teal-200 text-teal-700';
             let activeGlow = '';
 
             if (inv.status === 'standard') {
-              color = 'bg-emerald-50 border-emerald-300 text-emerald-700';
+              color = 'bg-teal-50 border-teal-300 text-teal-800';
             } else if (inv.status === 'checking') {
-              color = 'bg-cyan-100 border-cyan-400 text-cyan-700';
-              activeGlow = 'ring-2 ring-cyan-200 shadow-[0_0_12px_rgba(6,182,212,0.2)] animate-pulse';
+              color = 'bg-rose-100 border-rose-400 text-rose-700';
+              activeGlow = 'ring-2 ring-rose-200 shadow-[0_0_12px_rgba(244,63,94,0.3)] animate-pulse';
             } else if (inv.status === 'selected') {
-              color = 'bg-teal-100 border-teal-500 text-teal-800';
-              activeGlow = 'shadow-[0_0_12px_rgba(20,184,166,0.2)]';
+              color = 'bg-emerald-100 border-emerald-500 text-emerald-900 font-bold';
+              activeGlow = 'shadow-[0_0_12px_rgba(16,185,129,0.3)]';
             } else if (inv.status === 'rejected') {
-              color = 'bg-teal-300 border-teal-400 text-teal-600 line-through';
+              color = 'bg-slate-100 border-slate-300 text-slate-400 line-through';
             }
 
             return (
@@ -429,11 +431,11 @@ export default function VisualizerCanvas({ snapshot, activeAlgoId }: VisualizerC
           ))}
         </div>
 
-        <div className="flex items-center gap-4 text-[10px] text-teal-600 pt-3 font-semibold mt-2 select-none">
-          <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded bg-emerald-50 border border-emerald-300" /> In attesa</span>
-          <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded bg-cyan-100 border border-cyan-400" /> Valutazione</span>
-          <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded bg-teal-100 border border-teal-500" /> Selezionato</span>
-          <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded bg-teal-300 border border-teal-400" /> Escluso</span>
+        <div className="flex items-center gap-4 text-[10px] text-slate-700 pt-3 font-semibold mt-2 select-none">
+          <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded bg-teal-50 border border-teal-300" /> In attesa</span>
+          <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded bg-rose-100 border border-rose-400" /> Valutazione</span>
+          <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded bg-emerald-100 border border-emerald-500" /> Selezionato</span>
+          <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded bg-slate-100 border border-slate-300" /> Escluso</span>
         </div>
       </div>
     );
@@ -489,17 +491,17 @@ export default function VisualizerCanvas({ snapshot, activeAlgoId }: VisualizerC
               const isLeaf = !huffmanNodes.some(n => n.parentId === node.id);
               const isRoot = !node.parentId && huffmanNodes.length > 1 && huffmanNodes.every(n => n.parentId || n.id === node.id);
               
-              let fill = 'fill-white stroke-emerald-400';
-              let textFill = 'fill-emerald-800';
+              let fill = 'fill-white stroke-teal-400';
+              let textFill = 'fill-teal-800';
               let size = 15;
 
               if (isLeaf) {
-                fill = 'fill-emerald-50 stroke-emerald-500';
-                textFill = 'fill-emerald-700';
+                fill = 'fill-teal-50 stroke-teal-500';
+                textFill = 'fill-teal-700';
                 size = 14;
               } else if (isRoot) {
-                fill = 'fill-teal-100 stroke-teal-600';
-                textFill = 'fill-teal-900 font-bold';
+                fill = 'fill-emerald-100 stroke-emerald-600';
+                textFill = 'fill-emerald-900 font-bold';
                 size = 17;
               }
 
@@ -515,10 +517,10 @@ export default function VisualizerCanvas({ snapshot, activeAlgoId }: VisualizerC
           </svg>
         </div>
 
-        <div className="flex items-center justify-between text-[10px] text-teal-600 pt-3 border-t border-emerald-500/10 font-semibold mt-2 select-none">
-          <div className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-emerald-50 border border-emerald-500" /> Nodo Foglia (Carattere:Frequenza)</div>
-          <div className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-white border border-emerald-400" /> Sotto-radice / Somma Interna</div>
-          <div className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-teal-100 border border-teal-600" /> Radice Ottima dell'Albero</div>
+        <div className="flex items-center justify-between text-[10px] text-slate-700 pt-3 border-t border-emerald-500/10 font-semibold mt-2 select-none">
+          <div className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-teal-50 border border-teal-500" /> Nodo Foglia (Carattere:Frequenza)</div>
+          <div className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-white border border-teal-400" /> Sotto-radice / Somma Interna</div>
+          <div className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-emerald-100 border border-emerald-600" /> Radice Ottima dell'Albero</div>
         </div>
       </div>
     );
