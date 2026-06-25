@@ -220,6 +220,17 @@ export default function VisualizerCanvas({ snapshot, activeAlgoId }: VisualizerC
     if (!grid) return null;
     const { gridPath } = snapshot;
 
+    const numCols = colLabels.length;
+    const numRows = rowLabels.length;
+    const isLarge = numCols > 8 || numRows > 8;
+    const isExtraLarge = numCols > 12 || numRows > 12;
+
+    const textSizeClass = isExtraLarge ? 'text-[9.5px]' : isLarge ? 'text-[11px]' : 'text-[13px]';
+    const paddingClass = isExtraLarge ? 'p-1' : isLarge ? 'p-1.5' : 'p-2.5';
+    const thPaddingClass = isExtraLarge ? 'p-1' : isLarge ? 'p-1.5' : 'p-2';
+    const minWidthClass = isExtraLarge ? 'min-w-[28px]' : isLarge ? 'min-w-[40px]' : 'min-w-[55px]';
+    const headerWidthClass = isExtraLarge ? 'max-w-[70px]' : isLarge ? 'max-w-[100px]' : 'max-w-[140px]';
+
     return (
       <div className="glass-panel rounded-2xl p-6 flex flex-col justify-between min-h-[420px] shadow-xl w-full">
         <div className="border-b border-emerald-500/10 pb-3 mb-6">
@@ -229,12 +240,12 @@ export default function VisualizerCanvas({ snapshot, activeAlgoId }: VisualizerC
         </div>
 
         <div className="flex-1 overflow-auto max-h-[320px] border border-emerald-500/10 rounded-xl bg-emerald-50 p-2">
-          <table className="w-full text-center border-collapse font-mono text-[12px]">
+          <table className={`w-full text-center border-collapse font-mono ${textSizeClass}`}>
             <thead>
               <tr>
-                <th className="p-2 border border-emerald-200 bg-white/60 text-teal-600 select-none"></th>
+                <th className={`${thPaddingClass} border border-emerald-200 bg-white/60 text-teal-600 select-none`}></th>
                 {colLabels.map((col, cIdx) => (
-                  <th key={cIdx} className={`p-2 border border-emerald-200 bg-white/80 font-semibold text-teal-800 min-w-[55px] ${
+                  <th key={cIdx} className={`${thPaddingClass} border border-emerald-200 bg-white/80 font-semibold text-teal-800 ${minWidthClass} ${
                     activeCol === cIdx ? 'text-rose-700 bg-rose-100' : ''
                   }`}>
                     {col}
@@ -248,7 +259,7 @@ export default function VisualizerCanvas({ snapshot, activeAlgoId }: VisualizerC
                 
                 return (
                 <tr key={rIdx} className="hover:bg-emerald-100/50 transition-colors">
-                  <td className={`p-2 border border-emerald-200 font-semibold text-left select-none max-w-[140px] truncate transition-colors ${
+                  <td className={`${thPaddingClass} border border-emerald-200 font-semibold text-left select-none ${headerWidthClass} truncate transition-colors ${
                     activeRow === rIdx 
                       ? 'text-rose-700 bg-rose-100' 
                       : isSelectedRow 
@@ -277,7 +288,7 @@ export default function VisualizerCanvas({ snapshot, activeAlgoId }: VisualizerC
                     }
 
                     return (
-                      <td key={cIdx} className={`p-2.5 border border-emerald-200 transition-all font-mono ${cellColor} ${cellBg}`}>
+                      <td key={cIdx} className={`${paddingClass} border border-emerald-200 transition-all font-mono ${cellColor} ${cellBg}`}>
                         {cell === Infinity ? '∞' : cell}
                       </td>
                     );
@@ -555,17 +566,33 @@ export default function VisualizerCanvas({ snapshot, activeAlgoId }: VisualizerC
   // ==========================================
   // ROUTER VISUALIZATION CHANGER
   // ==========================================
-  if (grid && intervals && intervals.length > 0) {
-    return (
-      <div className="flex flex-col gap-6 w-full">
-        {renderTimeline()}
-        {renderDPGrid()}
-      </div>
-    );
-  }
-  if (grid) return renderDPGrid();
-  if (nodes && nodes.length > 0) return renderGraph();
-  if (intervals && intervals.length > 0) return renderTimeline();
-  if (huffmanNodes && huffmanNodes.length > 0) return renderHuffmanTree();
-  return renderBars();
+  const renderContent = () => {
+    if (grid && intervals && intervals.length > 0) {
+      return (
+        <div className="flex flex-col gap-6 w-full">
+          {renderTimeline()}
+          {renderDPGrid()}
+        </div>
+      );
+    }
+    if (grid) return renderDPGrid();
+    if (nodes && nodes.length > 0) return renderGraph();
+    if (intervals && intervals.length > 0) return renderTimeline();
+    if (huffmanNodes && huffmanNodes.length > 0) return renderHuffmanTree();
+    return renderBars();
+  };
+
+  return (
+    <div className="flex flex-col gap-6 w-full animate-fadeIn">
+      {description && (
+        <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-2xl p-4 flex items-start gap-3 shadow-sm select-text">
+          <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse mt-1.5 shrink-0" />
+          <p className="text-sm font-semibold text-emerald-950 leading-relaxed">
+            {description}
+          </p>
+        </div>
+      )}
+      {renderContent()}
+    </div>
+  );
 }
