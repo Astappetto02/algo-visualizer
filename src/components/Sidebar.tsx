@@ -36,7 +36,7 @@ export default function Sidebar({ selectedAlgoId, onSelectAlgo, isOpen, setIsOpe
       {/* Mobile Toggle Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="lg:hidden fixed top-4 left-4 z-50 p-2.5 rounded-xl bg-white/80 border border-emerald-200 text-emerald-950 backdrop-blur-md cursor-pointer hover:bg-emerald-50 transition"
+        className="xl:hidden fixed top-4 left-4 z-50 p-2.5 rounded-xl bg-white/80 border border-emerald-200 text-emerald-950 backdrop-blur-md cursor-pointer hover:bg-emerald-50 transition"
       >
         {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
       </button>
@@ -45,15 +45,15 @@ export default function Sidebar({ selectedAlgoId, onSelectAlgo, isOpen, setIsOpe
       {isOpen && (
         <div
           onClick={() => setIsOpen(false)}
-          className="lg:hidden fixed inset-0 z-40 bg-black/60 backdrop-blur-sm"
+          className="xl:hidden fixed inset-0 z-40 bg-black/60 backdrop-blur-sm"
         />
       )}
 
       {/* Sidebar Container */}
       <aside
-        className={`fixed inset-y-0 left-0 z-45 w-72 glass-panel flex flex-col transition-transform duration-300 lg:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-45 w-72 glass-panel flex flex-col transition-transform duration-300 xl:translate-x-0 ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
-        } lg:static lg:h-screen`}
+        } xl:static xl:h-screen`}
       >
         {/* Sidebar Header */}
         <div className="p-6 border-b border-emerald-500/10 flex flex-col gap-2">
