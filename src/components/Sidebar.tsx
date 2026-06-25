@@ -59,11 +59,11 @@ export default function Sidebar({ selectedAlgoId, onSelectAlgo, isOpen, setIsOpe
         <div className="p-6 border-b border-emerald-500/10 flex flex-col gap-2">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-500 via-teal-500 to-emerald-400 flex items-center justify-center shadow-lg shadow-emerald-500/30">
-              <span className="font-bold text-white text-sm">AG</span>
+              <span className="font-bold text-white text-sm">AV</span>
             </div>
             <div>
               <h1 className="font-bold text-lg leading-none bg-gradient-to-r from-emerald-950 via-emerald-800 to-teal-700 bg-clip-text text-transparent">
-                Antigravity Algo
+                Algo Visualizer
               </h1>
               <p className="text-xs text-emerald-600/80 mt-1 font-semibold tracking-wider uppercase">
                 Progettazione Algoritmi
@@ -127,7 +127,7 @@ export default function Sidebar({ selectedAlgoId, onSelectAlgo, isOpen, setIsOpe
             Corso di Laurea in Informatica
           </p>
           <p className="text-[10px] text-emerald-600/60 font-medium mt-0.5">
-            Docente: Prof. AI Antigravity
+            Supporto Didattico Integrativo
           </p>
         </div>
       </aside>
