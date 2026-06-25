@@ -25,6 +25,7 @@ export default function VisualizerCanvas({ snapshot, activeAlgoId }: VisualizerC
     activeIndices = [],
     mergedIndices = [],
     description,
+    variables = {},
     grid,
     rowLabels = [],
     colLabels = [],
@@ -74,14 +75,25 @@ export default function VisualizerCanvas({ snapshot, activeAlgoId }: VisualizerC
               {array.map((value, idx) => {
                 const isActive = activeIndices.includes(idx);
                 const isMerged = mergedIndices.includes(idx);
+                const isPivot = activeAlgoId === 'quicksort' &&
+                  variables &&
+                  variables.pivotIdx !== undefined &&
+                  variables.pivotIdx !== null &&
+                  variables.pivotIdx === idx;
+
                 const maxVal = Math.max(...array, 10);
-                const heightPct = `${Math.max(12, (value / maxVal) * 85)}%`;
+                const barHeightMax = activeAlgoId === 'quicksort' ? 70 : 82;
+                const heightPct = `${Math.max(12, (value / maxVal) * barHeightMax)}%`;
 
                 let barBg = 'bg-gradient-to-t from-teal-100 to-teal-300 border-teal-300';
                 let textColor = 'text-teal-700';
                 let shadow = '';
 
-                if (isActive) {
+                if (isPivot) {
+                  barBg = 'bg-gradient-to-t from-amber-400 to-amber-500 border-amber-400';
+                  textColor = 'text-amber-800 font-extrabold';
+                  shadow = 'shadow-[0_0_15px_rgba(245,158,11,0.55)]';
+                } else if (isActive) {
                   barBg = 'bg-gradient-to-t from-rose-300 to-rose-500 border-rose-400 animate-pulse';
                   textColor = 'text-rose-700 font-bold';
                   shadow = 'shadow-[0_0_15px_rgba(244,63,94,0.5)]';
@@ -93,6 +105,14 @@ export default function VisualizerCanvas({ snapshot, activeAlgoId }: VisualizerC
                 return (
                   <div key={idx} className="flex flex-col items-center flex-1 transition-all duration-300" style={{ height: '100%' }}>
                     <div className="flex flex-col justify-end items-center h-full w-full relative">
+                      {isPivot && (
+                        <div className="flex flex-col items-center select-none z-10 mb-1">
+                          <span className="bg-amber-500 text-white text-[8px] sm:text-[9px] font-bold px-1.5 py-0.5 rounded shadow-md whitespace-nowrap animate-pulse">
+                            PIVOT
+                          </span>
+                          <span className="text-amber-500 text-[8px] leading-none">▼</span>
+                        </div>
+                      )}
                       <span className={`text-xs font-mono font-bold mb-1.5 ${textColor}`}>{value}</span>
                       <div style={{ height: heightPct }} className={`w-full rounded-t-lg border-t border-x transition-all duration-300 ${barBg} ${shadow}`} />
                       <span className="text-[10px] text-teal-600 font-mono mt-1.5 absolute -bottom-5">{idx}</span>
@@ -111,6 +131,12 @@ export default function VisualizerCanvas({ snapshot, activeAlgoId }: VisualizerC
                 <span className="w-2.5 h-2.5 rounded-sm bg-gradient-to-t from-rose-300 to-rose-500 border border-rose-400 animate-pulse" />
                 <span>Attivo / Confronto</span>
               </div>
+              {activeAlgoId === 'quicksort' && (
+                <div className="flex items-center gap-1.5">
+                  <span className="w-2.5 h-2.5 rounded-sm bg-gradient-to-t from-amber-400 to-amber-500 border border-amber-400 shadow-[0_0_8px_rgba(245,158,11,0.4)] animate-pulse" />
+                  <span>Pivot</span>
+                </div>
+              )}
               <div className="flex items-center gap-1.5">
                 <span className="w-2.5 h-2.5 rounded-sm bg-gradient-to-t from-emerald-400 to-emerald-600 border border-emerald-500" />
                 <span>Fissato / Ordinato</span>
@@ -529,6 +555,14 @@ export default function VisualizerCanvas({ snapshot, activeAlgoId }: VisualizerC
   // ==========================================
   // ROUTER VISUALIZATION CHANGER
   // ==========================================
+  if (grid && intervals && intervals.length > 0) {
+    return (
+      <div className="flex flex-col gap-6 w-full">
+        {renderTimeline()}
+        {renderDPGrid()}
+      </div>
+    );
+  }
   if (grid) return renderDPGrid();
   if (nodes && nodes.length > 0) return renderGraph();
   if (intervals && intervals.length > 0) return renderTimeline();

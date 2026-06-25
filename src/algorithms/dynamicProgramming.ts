@@ -51,7 +51,7 @@ export function generateFibonacciSnapshots(n: number = 8): AlgorithmSnapshot[] {
     variables: Record<string, any> = {}
   ) => {
     snapshots.push({
-      grid: [F], // Represent F as a 1-row matrix for Grid Visualizer
+      grid: [[...F]], // Represent F as a 1-row matrix for Grid Visualizer
       rowLabels: ['F[i]'],
       colLabels: Array.from({ length: n + 1 }, (_, idx) => `i=${idx}`),
       activeRow: 0,
@@ -176,8 +176,8 @@ export function generateWeightedIntervalsSnapshots(
     variables: Record<string, any> = {}
   ) => {
     snapshots.push({
-      intervals,
-      grid: [M],
+      intervals: intervals.map(inv => ({ ...inv })),
+      grid: [[...M]],
       rowLabels: ['M[j]'],
       colLabels: Array.from({ length: n + 1 }, (_, idx) => `j=${idx}`),
       activeRow: 0,
@@ -270,13 +270,11 @@ export function generateWeightedIntervalsSnapshots(
     status: selectedIds.includes(inv.id) ? ('selected' as const) : ('rejected' as const)
   }));
 
-  addSnapshot(6, `Backtracking terminato. La soluzione ottima ha peso totale M[n] = ${M[n]} e contiene gli intervalli: ${selectedIds.reverse().join(', ')}.`, null, finalSolSolIntervals(finalSolIntervals), { "Soluzione Ottima": selectedIds.join(', ') });
+  const solSortedChronologically = [...selectedIds].reverse().join(', ');
+
+  addSnapshot(6, `Backtracking terminato. La soluzione ottima ha peso totale M[n] = ${M[n]} e contiene gli intervalli: ${solSortedChronologically}.`, null, finalSolIntervals, { "Soluzione Ottima": solSortedChronologically });
 
   return snapshots;
-}
-
-function finalSolSolIntervals(invs: VisualInterval[]) {
-  return invs;
 }
 
 // ==========================================

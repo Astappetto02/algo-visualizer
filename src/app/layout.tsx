@@ -15,6 +15,11 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Antigravity Algo - Visualizzatore di Algoritmi",
   description: "Piattaforma interattiva per l'apprendimento e la visualizzazione degli algoritmi universitari.",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "Algo Visualizer",
+  },
 };
 
 export default function RootLayout({

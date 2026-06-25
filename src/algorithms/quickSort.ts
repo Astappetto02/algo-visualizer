@@ -40,7 +40,7 @@ export const quickSortDefinition: AlgorithmDefinition = {
   ]
 };
 
-export function generateQuickSortSnapshots(initialArray: number[]): AlgorithmSnapshot[] {
+export function generateQuickSortSnapshots(initialArray: number[], pivotStrategy: 'first' | 'last' = 'last'): AlgorithmSnapshot[] {
   const snapshots: AlgorithmSnapshot[] = [];
   const A = [...initialArray];
   const stable = new Set<number>(); // Track sorted positions
@@ -61,6 +61,7 @@ export function generateQuickSortSnapshots(initialArray: number[]): AlgorithmSna
         low: null,
         high: null,
         pivot: null,
+        pivotIdx: null,
         i: null,
         j: null,
         ...variables
@@ -83,25 +84,31 @@ export function generateQuickSortSnapshots(initialArray: number[]): AlgorithmSna
   }
 
   function partition(low: number, high: number): number {
+    if (pivotStrategy === 'first') {
+      addSnapshot(7, `Scelta del pivot (Primo Elemento): selezioniamo A[low] (${A[low]}) come perno della partizione.`, [low], { low, high, pivot: A[low], pivotIdx: low });
+      addSnapshot(7, `Per eseguire il partizionamento Lomuto, scambiamo il pivot A[low] (${A[low]}) con A[high] (${A[high]}).`, [low, high], { low, high, pivot: A[low], pivotIdx: low });
+      [A[low], A[high]] = [A[high], A[low]];
+    }
+
     const pivot = A[high];
-    addSnapshot(7, `Scelta del pivot: selezioniamo A[high] (${pivot}) come perno della partizione.`, [high], { low, high, pivot });
+    addSnapshot(7, `Iniziamo il partizionamento: il pivot è ${pivot} (all'indice ${high}).`, [high], { low, high, pivot, pivotIdx: high });
     
     let i = low - 1;
-    addSnapshot(8, `Inizializziamo i = low - 1 = ${i}. Scansioniamo gli elementi con j da ${low} a ${high - 1}.`, [high], { low, high, pivot, i });
+    addSnapshot(8, `Inizializziamo i = low - 1 = ${i}. Scansioniamo gli elementi con j da ${low} a ${high - 1}.`, [high], { low, high, pivot, pivotIdx: high, i });
 
     for (let j = low; j < high; j++) {
-      addSnapshot(10, `Confronto: controlliamo se A[j] (${A[j]}) < pivot (${pivot})`, [j, high], { low, high, pivot, i, j });
+      addSnapshot(10, `Confronto: controlliamo se A[j] (${A[j]}) < pivot (${pivot})`, [j, high], { low, high, pivot, pivotIdx: high, i, j });
       
       if (A[j] < pivot) {
         i++;
-        addSnapshot(11, `A[j] è minore. Incrementiamo i = ${i} e scambiamo A[i] con A[j].`, [i, j, high], { low, high, pivot, i, j });
+        addSnapshot(11, `A[j] è minore. Incrementiamo i = ${i} e scambiamo A[i] con A[j].`, [i, j, high], { low, high, pivot, pivotIdx: high, i, j });
         [A[i], A[j]] = [A[j], A[i]];
-        addSnapshot(12, `Scambio eseguito: A[i] è ora ${A[i]}, A[j] è ora ${A[j]}.`, [i, j, high], { low, high, pivot, i, j });
+        addSnapshot(12, `Scambio eseguito: A[i] è ora ${A[i]}, A[j] è ora ${A[j]}.`, [i, j, high], { low, high, pivot, pivotIdx: high, i, j });
       }
     }
 
     const swapIdx = i + 1;
-    addSnapshot(13, `Finiamo la scansione. Scambiamo il pivot A[high] (${A[high]}) con A[i + 1] (${A[swapIdx]}) per rimetterlo al centro.`, [swapIdx, high], { low, high, pivot, i, pivotIdx: swapIdx });
+    addSnapshot(13, `Finiamo la scansione. Scambiamo il pivot A[high] (${A[high]}) con A[i + 1] (${A[swapIdx]}) per rimetterlo al centro.`, [swapIdx, high], { low, high, pivot, i, pivotIdx: high });
     [A[swapIdx], A[high]] = [A[high], A[swapIdx]];
     stable.add(swapIdx); // Pivot is now in final sorted position
 
