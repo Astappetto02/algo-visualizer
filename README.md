@@ -1,5 +1,7 @@
 # 🎓 Algorithmic Design Suite — SPA Visualizer
 
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-GitHub%20Pages-blue?style=for-the-badge)](https://astappetto02.github.io/algo-visualizer/)
+
 An interactive, premium Single Page Application (SPA) designed as an educational tool for university courses in **Algorithm Design & Analysis** (Progettazione e Analisi di Algoritmi). Built with Next.js, React, Tailwind CSS, and Framer Motion.
 
 ---
