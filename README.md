@@ -27,7 +27,7 @@ It's super easy! The app turns boring code into beautiful graphical visualizatio
 
 While the algorithm runs, you can use the media controls to **Pause**, go **Forward** or **Backward** in time, or even change the execution speed. There's also a handy side panel showing you the pseudocode line by line and the current values of local variables!
 
-## 🛠️ Behind the Scenes (For the Nerds)
+## 🛠️ Behind the Scenes 
 
 If you're curious about how this project was built:
 * **React 19 & Next.js 16**: Because we like speed.
