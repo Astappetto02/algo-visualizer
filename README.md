@@ -10,14 +10,14 @@ Forget dusty books and papers full of incomprehensible scribbles. Here you can s
 
 ## ✨ What's Inside?
 
-We've packed in 13 of the most feared computer science algorithms, grouped by paradigm:
+We've packed in 14 of the most feared computer science algorithms, grouped by paradigm:
 
 * **Divide & Conquer**: Binary Search, MergeSort, QuickSort. *(Yes, you'll finally understand how the pivot works).*
 * **Dynamic Programming**: Fibonacci, Weighted Interval Scheduling, Sequence Alignment, Knapsack. *(Matrices won't be a mystery anymore).*
 * **Greedy**: Interval Scheduling, Huffman Coding.
 * **Graphs**: BFS, DFS, Dijkstra, Bellman-Ford, Prim's MST. *(Nodes and edges will literally come to life).*
 
-## 🎮 How does it work?
+## 🎮 How It Works
 
 It's super easy! The app turns boring code into beautiful graphical visualizations:
 - **Bars and Trees** for sorting algorithms.
