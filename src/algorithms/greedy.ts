@@ -73,7 +73,7 @@ export function generateIntervalSchedulingSnapshots(
     variables: Record<string, any> = {}
   ) => {
     snapshots.push({
-      intervals: [...intervals],
+      intervals: intervals.map(inv => ({ ...inv })),
       codeLine,
       description,
       variables: {
@@ -167,25 +167,60 @@ export const huffmanDefinition: AlgorithmDefinition = {
   ]
 };
 
-export function generateHuffmanSnapshots(customText?: string): AlgorithmSnapshot[] {
+export function generateHuffmanSnapshots(customText?: string, mode: 'text' | 'freq' = 'text'): AlgorithmSnapshot[] {
   const snapshots: AlgorithmSnapshot[] = [];
   
   let initialNodes: Array<{ id: string; label: string; freq: number }> = [];
 
   if (customText && customText.trim().length > 0) {
-    // Compute frequencies
-    const text = customText.trim().toUpperCase();
-    const freqMap: Record<string, number> = {};
-    for (const char of text) {
-      if (char !== ' ') {
-        freqMap[char] = (freqMap[char] || 0) + 1;
+    if (mode === 'freq') {
+      const regex = /([A-Z])\s*[:=\s-]?\s*(\d+)/gi;
+      let match;
+      const freqMap: Record<string, number> = {};
+      while ((match = regex.exec(customText)) !== null) {
+        const char = match[1].toUpperCase();
+        const freq = parseInt(match[2], 10);
+        if (!isNaN(freq)) {
+          freqMap[char] = freq;
+        }
       }
+
+      initialNodes = Object.keys(freqMap).map(char => ({
+        id: char,
+        label: `${char}:${freqMap[char]}`,
+        freq: freqMap[char]
+      }));
+
+      // Fallback if no patterns matched
+      if (initialNodes.length === 0) {
+        const text = customText.trim().toUpperCase();
+        const textFreqMap: Record<string, number> = {};
+        for (const char of text) {
+          if (char !== ' ') {
+            textFreqMap[char] = (textFreqMap[char] || 0) + 1;
+          }
+        }
+        initialNodes = Object.keys(textFreqMap).map(char => ({
+          id: char,
+          label: `${char}:${textFreqMap[char]}`,
+          freq: textFreqMap[char]
+        }));
+      }
+    } else {
+      // Compute frequencies
+      const text = customText.trim().toUpperCase();
+      const freqMap: Record<string, number> = {};
+      for (const char of text) {
+        if (char !== ' ') {
+          freqMap[char] = (freqMap[char] || 0) + 1;
+        }
+      }
+      initialNodes = Object.keys(freqMap).map(char => ({
+        id: char,
+        label: `${char}:${freqMap[char]}`,
+        freq: freqMap[char]
+      }));
     }
-    initialNodes = Object.keys(freqMap).map(char => ({
-      id: char,
-      label: `${char}:${freqMap[char]}`,
-      freq: freqMap[char]
-    }));
   } else {
     // Starting alphabet
     initialNodes = [

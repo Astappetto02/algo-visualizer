@@ -15,7 +15,7 @@ export default function ExecutionPanel({
   variables,
 }: ExecutionPanelProps) {
   return (
-    <div className="glass-panel rounded-2xl p-6 shadow-xl flex flex-col gap-5 h-full min-h-[460px]">
+    <div className="glass-panel rounded-2xl p-6 shadow-xl flex flex-col gap-5 min-h-[460px]">
       <div className="flex border-b border-emerald-500/10 pb-2.5 items-center select-none">
         <div className="flex items-center gap-1.5 px-1">
           <Terminal className="w-4 h-4 text-emerald-600" />

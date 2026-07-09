@@ -48,9 +48,11 @@ export default function Home() {
       gap: 1
     },
     huffmanText: "ABRACADABRA",
+    huffmanMode: 'text' as 'text' | 'freq',
     customIntervalsText: "1,3,10\n2,5,20\n3,6,15\n5,7,12",
     customEdgesText: "A,B,4\nA,C,2\nB,C,1\nB,D,5\nC,D,8\nC,E,10\nD,E,2",
-    customKnapsackText: "O1,2,3\nO2,3,4\nO3,4,5\nO4,5,8"
+    customKnapsackText: "O1,2,3\nO2,3,4\nO3,4,5\nO4,5,8",
+    quickSortPivot: 'last' as 'first' | 'last'
   });
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
 
@@ -58,6 +60,11 @@ export default function Home() {
 
   useEffect(() => {
     setMounted(true);
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js')
+        .then((reg) => console.log('Service Worker registered successfully:', reg.scope))
+        .catch((err) => console.warn('Service Worker registration failed:', err));
+    }
   }, []);
 
   // Get active algorithm metadata definition
@@ -114,7 +121,7 @@ export default function Home() {
       case 'binarysearch':
         return generateBinarySearchSnapshots(config.array, config.target);
       case 'quicksort':
-        return generateQuickSortSnapshots(config.array);
+        return generateQuickSortSnapshots(config.array, config.quickSortPivot);
       case 'fibonacci':
         const fibN = Math.max(2, Math.min(config.target, 10)); // keep between 2 and 10
         return generateFibonacciSnapshots(fibN);
@@ -128,7 +135,7 @@ export default function Home() {
       case 'intervalscheduling':
         return generateIntervalSchedulingSnapshots(parseIntervals(config.customIntervalsText));
       case 'huffman':
-        return generateHuffmanSnapshots(config.huffmanText);
+        return generateHuffmanSnapshots(config.huffmanText, config.huffmanMode);
       case 'bfsdfs':
         return generateBfsDfsSnapshots(true, parseEdges(config.customEdgesText)); // Default to BFS
       case 'dijkstra':
@@ -179,7 +186,7 @@ export default function Home() {
       />
 
       {/* Main dashboard content area */}
-      <main className="flex-1 flex flex-col h-full overflow-y-auto relative p-6 lg:p-8 pt-20 lg:pt-8 gap-6">
+      <main className="flex-1 flex flex-col h-full overflow-y-auto relative p-4 md:p-6 xl:p-8 pt-20 xl:pt-8 gap-6">
         
 
 
@@ -201,9 +208,9 @@ export default function Home() {
         )}
 
         {/* Dynamic Canvas + Sidebar Panel Layout Grid */}
-        <div className="grid grid-cols-1 xl:grid-cols-4 gap-6 items-start flex-1">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start flex-1">
           {/* Visualizer and Control Area (Takes 3/4 widths) */}
-          <div className="xl:col-span-3 flex flex-col gap-6 w-full">
+          <div className="lg:col-span-3 flex flex-col gap-6 w-full">
             {/* Visual Canvas containing Bars, DP Grid, or SVG Graph */}
             <VisualizerCanvas snapshot={currentSnapshot} activeAlgoId={selectedAlgoId} />
             {/* Controller interface */}
@@ -230,8 +237,8 @@ export default function Home() {
             )}
           </div>
 
-          {/* Configuration Sidebar Panel (Takes 1/4 widths) */}
-          <div className="flex flex-col gap-6 w-full">
+          {/* Configuration Sidebar Panel (Takes 1/4 widths on desktop, grid side-by-side on portrait tablet) */}
+          <div className="flex flex-col md:grid md:grid-cols-2 lg:flex lg:flex-col gap-6 w-full">
             {/* Input Configurator */}
             <InputPanel
               algoId={selectedAlgoId}

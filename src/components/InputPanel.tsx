@@ -17,9 +17,11 @@ interface InputPanelProps {
       gap: number;
     };
     huffmanText: string;
+    huffmanMode: 'text' | 'freq';
     customIntervalsText: string;
     customEdgesText: string;
     customKnapsackText: string;
+    quickSortPivot?: 'first' | 'last';
   };
   onConfigChange: (newConfig: any) => void;
 }
@@ -59,6 +61,24 @@ export default function InputPanel({ algoId, config, onConfigChange }: InputPane
       onConfigChange({ ...localConfig, array: numbers });
       setError(null);
       return;
+    }
+
+    if (algoId === 'huffman') {
+      if (localConfig.huffmanMode === 'freq') {
+        const text = localConfig.huffmanText || '';
+        const regex = /([A-Z])\s*[:=\s-]?\s*(\d+)/gi;
+        const matches = [...text.matchAll(regex)];
+        if (matches.length === 0) {
+          setError("Inserisci almeno una lettera con la sua frequenza (es. A:25, B:12).");
+          return;
+        }
+      } else {
+        const text = localConfig.huffmanText || '';
+        if (text.trim().length === 0) {
+          setError("Inserisci del testo da comprimere.");
+          return;
+        }
+      }
     }
 
     setError(null);
@@ -102,6 +122,50 @@ export default function InputPanel({ algoId, config, onConfigChange }: InputPane
                 title="Genera array casuale"
               >
                 <RefreshCw className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        )}
+
+        {algoId === 'quicksort' && (
+          <div className="flex flex-col gap-2 w-full mt-1">
+            <label className="text-xs font-semibold text-teal-600 uppercase">Strategia Pivot</label>
+            <div className="grid grid-cols-2 gap-2 bg-emerald-50/50 p-1 rounded-xl border border-emerald-100/80">
+              <button
+                type="button"
+                onClick={() => {
+                  const newConfig = {
+                    ...localConfig,
+                    quickSortPivot: 'last' as const
+                  };
+                  setLocalConfig(newConfig);
+                  onConfigChange(newConfig);
+                }}
+                className={`py-1.5 px-3 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                  localConfig.quickSortPivot === 'last' || !localConfig.quickSortPivot
+                    ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-sm'
+                    : 'text-teal-700 hover:bg-emerald-100/50'
+                }`}
+              >
+                Ultimo Elemento
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  const newConfig = {
+                    ...localConfig,
+                    quickSortPivot: 'first' as const
+                  };
+                  setLocalConfig(newConfig);
+                  onConfigChange(newConfig);
+                }}
+                className={`py-1.5 px-3 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                  localConfig.quickSortPivot === 'first'
+                    ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-sm'
+                    : 'text-teal-700 hover:bg-emerald-100/50'
+                }`}
+              >
+                Primo Elemento
               </button>
             </div>
           </div>
@@ -204,14 +268,61 @@ export default function InputPanel({ algoId, config, onConfigChange }: InputPane
         )}
 
         {algoId === 'huffman' && (
-          <div className="flex flex-col gap-1.5 w-full">
-            <label className="text-xs font-semibold text-teal-600 uppercase">Testo da Comprimere</label>
-            <input
-              type="text"
-              value={localConfig.huffmanText}
-              onChange={(e) => setLocalConfig({...localConfig, huffmanText: e.target.value})}
-              className={inputClass}
-            />
+          <div className="flex flex-col gap-2.5 w-full">
+            <label className="text-xs font-semibold text-teal-600 uppercase">Modalità Huffman</label>
+            <div className="grid grid-cols-2 gap-2 bg-emerald-50/50 p-1 rounded-xl border border-emerald-100/80">
+              <button
+                type="button"
+                onClick={() => {
+                  const newConfig = {
+                    ...localConfig,
+                    huffmanMode: 'text' as const,
+                    huffmanText: localConfig.huffmanText === 'A: 45, B: 13, C: 12, D: 16, E: 9, F: 5' ? 'ABRACADABRA' : localConfig.huffmanText
+                  };
+                  setLocalConfig(newConfig);
+                  onConfigChange(newConfig);
+                }}
+                className={`py-1.5 px-3 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                  localConfig.huffmanMode === 'text'
+                    ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-sm'
+                    : 'text-teal-700 hover:bg-emerald-100/50'
+                }`}
+              >
+                Conteggio Testo
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  const newConfig = {
+                    ...localConfig,
+                    huffmanMode: 'freq' as const,
+                    huffmanText: localConfig.huffmanText === 'ABRACADABRA' ? 'A: 45, B: 13, C: 12, D: 16, E: 9, F: 5' : localConfig.huffmanText
+                  };
+                  setLocalConfig(newConfig);
+                  onConfigChange(newConfig);
+                }}
+                className={`py-1.5 px-3 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                  localConfig.huffmanMode === 'freq'
+                    ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-sm'
+                    : 'text-teal-700 hover:bg-emerald-100/50'
+                }`}
+              >
+                Valori Lettere
+              </button>
+            </div>
+            
+            <div className="flex flex-col gap-1.5 w-full">
+              <label className="text-xs font-semibold text-teal-600 uppercase">
+                {localConfig.huffmanMode === 'freq' ? 'Frequenze Lettere (es. A:25, B:12)' : 'Testo da Comprimere'}
+              </label>
+              <input
+                type="text"
+                value={localConfig.huffmanText}
+                onChange={(e) => setLocalConfig({...localConfig, huffmanText: e.target.value})}
+                placeholder={localConfig.huffmanMode === 'freq' ? 'A: 45, B: 13, C: 12...' : 'ABRACADABRA'}
+                className={inputClass}
+              />
+            </div>
           </div>
         )}
 

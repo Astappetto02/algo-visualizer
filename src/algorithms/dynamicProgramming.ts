@@ -51,7 +51,7 @@ export function generateFibonacciSnapshots(n: number = 8): AlgorithmSnapshot[] {
     variables: Record<string, any> = {}
   ) => {
     snapshots.push({
-      grid: [F], // Represent F as a 1-row matrix for Grid Visualizer
+      grid: [[...F]], // Represent F as a 1-row matrix for Grid Visualizer
       rowLabels: ['F[i]'],
       colLabels: Array.from({ length: n + 1 }, (_, idx) => `i=${idx}`),
       activeRow: 0,
@@ -176,8 +176,8 @@ export function generateWeightedIntervalsSnapshots(
     variables: Record<string, any> = {}
   ) => {
     snapshots.push({
-      intervals,
-      grid: [M],
+      intervals: intervals.map(inv => ({ ...inv })),
+      grid: [[...M]],
       rowLabels: ['M[j]'],
       colLabels: Array.from({ length: n + 1 }, (_, idx) => `j=${idx}`),
       activeRow: 0,
@@ -270,13 +270,11 @@ export function generateWeightedIntervalsSnapshots(
     status: selectedIds.includes(inv.id) ? ('selected' as const) : ('rejected' as const)
   }));
 
-  addSnapshot(6, `Backtracking terminato. La soluzione ottima ha peso totale M[n] = ${M[n]} e contiene gli intervalli: ${selectedIds.reverse().join(', ')}.`, null, finalSolSolIntervals(finalSolIntervals), { "Soluzione Ottima": selectedIds.join(', ') });
+  const solSortedChronologically = [...selectedIds].reverse().join(', ');
+
+  addSnapshot(6, `Backtracking terminato. La soluzione ottima ha peso totale M[n] = ${M[n]} e contiene gli intervalli: ${solSortedChronologically}.`, null, finalSolIntervals, { "Soluzione Ottima": solSortedChronologically });
 
   return snapshots;
-}
-
-function finalSolSolIntervals(invs: VisualInterval[]) {
-  return invs;
 }
 
 // ==========================================
@@ -362,7 +360,8 @@ export function generateSequenceAlignmentSnapshots(
     description: string,
     activeRow: number | null,
     activeCol: number | null,
-    variables: Record<string, any> = {}
+    variables: Record<string, any> = {},
+    gridPath?: { r: number; c: number }[]
   ) => {
     snapshots.push({
       grid: dp.map(row => [...row]),
@@ -370,6 +369,7 @@ export function generateSequenceAlignmentSnapshots(
       colLabels,
       activeRow,
       activeCol,
+      gridPath: gridPath ? [...gridPath] : undefined,
       codeLine,
       description,
       variables: {
@@ -427,7 +427,109 @@ export function generateSequenceAlignmentSnapshots(
     }
   }
 
-  addSnapshot(11, `Costo minimo di allineamento finale calcolato: dp[m][n] = ${dp[m][n]}`, m, n);
+  // Backtracking to find the alignment
+  let iBack = m;
+  let jBack = n;
+  const alignedXList: string[] = [];
+  const alignedYList: string[] = [];
+  const path: { r: number; c: number }[] = [{ r: iBack, c: jBack }];
+
+  const getAlignmentStrings = (currI: number, currJ: number) => {
+    const prefixX = X.slice(0, currI).split('').join(' ');
+    const prefixY = Y.slice(0, currJ).split('').join(' ');
+    const suffixX = [...alignedXList].reverse().join(' ');
+    const suffixY = [...alignedYList].reverse().join(' ');
+    return {
+      "Allineamento X": (prefixX ? prefixX + ' ' : '') + (suffixX ? '➔ ' + suffixX : ''),
+      "Allineamento Y": (prefixY ? prefixY + ' ' : '') + (suffixY ? '➔ ' + suffixY : '')
+    };
+  };
+
+  addSnapshot(11, `Costo minimo di allineamento finale calcolato: dp[m][n] = ${dp[m][n]}. Avviamo il backtracking per ricostruire l'allineamento ottimo.`, iBack, jBack, {
+    ...getAlignmentStrings(iBack, jBack),
+    "Stato": "Inizio Backtracking"
+  }, path);
+
+  while (iBack > 0 || jBack > 0) {
+    const charX = iBack > 0 ? X[iBack - 1] : '';
+    const charY = jBack > 0 ? Y[jBack - 1] : '';
+
+    // 1. Check Diagonal (Match/Mismatch)
+    if (iBack > 0 && jBack > 0) {
+      const matchScore = getMatchScore(charX, charY);
+      if (dp[iBack][jBack] === dp[iBack - 1][jBack - 1] + matchScore) {
+        alignedXList.push(charX);
+        alignedYList.push(charY);
+        iBack--;
+        jBack--;
+        path.push({ r: iBack, c: jBack });
+        addSnapshot(
+          11,
+          `Backtracking: dp[${iBack + 1}][${jBack + 1}] (${dp[iBack + 1][jBack + 1]}) deriva da Diag dp[${iBack}][${jBack}] (${dp[iBack][jBack]}) + costo ${charX === charY ? 'Match' : 'Mismatch'} (${matchScore}). Scegliamo di allineare '${charX}' con '${charY}'.`,
+          iBack,
+          jBack,
+          {
+            ...getAlignmentStrings(iBack, jBack),
+            "Scelta": charX === charY ? `Match ('${charX}')` : `Mismatch ('${charX}' ↔ '${charY}')`
+          },
+          path
+        );
+        continue;
+      }
+    }
+
+    // 2. Check Up (Deletion / Gap in Y)
+    if (iBack > 0 && dp[iBack][jBack] === dp[iBack - 1][jBack] + GAP) {
+      alignedXList.push(charX);
+      alignedYList.push('-');
+      iBack--;
+      path.push({ r: iBack, c: jBack });
+      addSnapshot(
+        11,
+        `Backtracking: dp[${iBack + 1}][${jBack}] (${dp[iBack + 1][jBack]}) deriva da Sopra dp[${iBack}][${jBack}] (${dp[iBack][jBack]}) + costo Gap (${GAP}). Scegliamo di inserire un gap '-' in Y.`,
+        iBack,
+        jBack,
+        {
+          ...getAlignmentStrings(iBack, jBack),
+          "Scelta": `Gap in Y (X='${charX}')`
+        },
+        path
+      );
+      continue;
+    }
+
+    // 3. Check Left (Insertion / Gap in X)
+    if (jBack > 0 && dp[iBack][jBack] === dp[iBack][jBack - 1] + GAP) {
+      alignedXList.push('-');
+      alignedYList.push(charY);
+      jBack--;
+      path.push({ r: iBack, c: jBack });
+      addSnapshot(
+        11,
+        `Backtracking: dp[${iBack}][${jBack + 1}] (${dp[iBack][jBack + 1]}) deriva da Sinistra dp[${iBack}][${jBack}] (${dp[iBack][jBack]}) + costo Gap (${GAP}). Scegliamo di inserire un gap '-' in X.`,
+        iBack,
+        jBack,
+        {
+          ...getAlignmentStrings(iBack, jBack),
+          "Scelta": `Gap in X (Y='${charY}')`
+        },
+        path
+      );
+      continue;
+    }
+  }
+
+  // Final snapshot showing the complete alignment and final result
+  const finalX = [...alignedXList].reverse().join(' ');
+  const finalY = [...alignedYList].reverse().join(' ');
+  
+  addSnapshot(11, `Backtracking terminato. Allineamento ottimo ricostruito con costo totale = ${dp[m][n]}.`, null, null, {
+    "Allineamento X": finalX,
+    "Allineamento Y": finalY,
+    "Costo Totale": dp[m][n],
+    "Stato": "Completato"
+  }, path);
+
   return snapshots;
 }
 
