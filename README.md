@@ -1,57 +1,57 @@
-# 🎓 Algo Visualizer — Impara gli Algoritmi Senza Piangere!
+# 🎓 Algo Visualizer — Learn Algorithms Without Tears!
 
-[![Live Demo](https://img.shields.io/badge/Live%20Demo-Provalo%20Ora!-blue?style=for-the-badge)](https://astappetto02.github.io/algo-visualizer/)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Try%20it%20now!-blue?style=for-the-badge)](https://astappetto02.github.io/algo-visualizer/)
 
-Benvenuto in **Algo Visualizer**, un'applicazione web interattiva creata per salvarti la vita (e l'esame) in Progettazione e Analisi di Algoritmi. 🎉
+Welcome to **Algo Visualizer**, an interactive web application built to save your life (and your exams) in Algorithm Design & Analysis. 🎉
 
-Dimentica i vecchi libri polverosi o i fogli di carta pieni di scarabocchi incomprensibili. Qui puoi vedere **esattamente** cosa succede "sotto il cofano" mentre l'algoritmo gira, passo dopo passo!
+Forget dusty books and papers full of incomprehensible scribbles. Here you can see **exactly** what happens "under the hood" while the algorithm runs, step by step!
 
 ---
 
-## ✨ Cosa c'è dentro?
+## ✨ What's Inside?
 
-Abbiamo racchiuso 13 degli algoritmi più temuti dagli studenti di informatica, suddivisi per paradigma:
+We've packed in 13 of the most feared computer science algorithms, grouped by paradigm:
 
-* **Divide et Impera**: Binary Search, MergeSort, QuickSort. *(Sì, finalmente capirai come funziona il pivot).*
-* **Programmazione Dinamica**: Fibonacci, Weighted Interval Scheduling, Sequence Alignment, Knapsack. *(Le matrici non avranno più segreti).*
+* **Divide & Conquer**: Binary Search, MergeSort, QuickSort. *(Yes, you'll finally understand how the pivot works).*
+* **Dynamic Programming**: Fibonacci, Weighted Interval Scheduling, Sequence Alignment, Knapsack. *(Matrices won't be a mystery anymore).*
 * **Greedy**: Interval Scheduling, Huffman Coding.
-* **Grafi**: BFS, DFS, Dijkstra, Bellman-Ford, Prim's MST. *(I nodi e gli archi prenderanno letteralmente vita).*
+* **Graphs**: BFS, DFS, Dijkstra, Bellman-Ford, Prim's MST. *(Nodes and edges will literally come to life).*
 
-## 🎮 Come funziona?
+## 🎮 How does it work?
 
-È facilissimo! L'app trasforma il codice noioso in bellissime visualizzazioni grafiche:
-- **Barre e Alberi** per gli algoritmi di ordinamento.
-- **Griglie 2D** che si colorano in tempo reale per la Programmazione Dinamica.
-- **Nodi vettoriali** (SVG) per esplorare i Grafi.
-- **Timeline a blocchi** per simulare le tempistiche (es. Interval Scheduling).
+It's super easy! The app turns boring code into beautiful graphical visualizations:
+- **Bars and Trees** for sorting algorithms.
+- **2D Grids** that color in real-time for Dynamic Programming.
+- **Vector Nodes** (SVG) for exploring Graphs.
+- **Block Timelines** to simulate timings (e.g., Interval Scheduling).
 
-Mentre l'algoritmo gira, puoi usare i controlli per mettere in **Pausa**, andare **Avanti** o **Indietro** nel tempo, o persino cambiare la velocità di esecuzione. C'è anche un comodo pannello laterale che ti mostra il codice riga per riga e il valore attuale delle variabili!
+While the algorithm runs, you can use the media controls to **Pause**, go **Forward** or **Backward** in time, or even change the execution speed. There's also a handy side panel showing you the pseudocode line by line and the current values of local variables!
 
-## 🛠️ Dietro le Quinte (per i Nerd)
+## 🛠️ Behind the Scenes (For the Nerds)
 
-Se sei curioso di sapere come è stato costruito questo progetto:
-* **React 19 & Next.js 16**: Perché ci piace la velocità.
-* **Tailwind CSS v4**: Per un look elegante, moderno e minimal.
-* **Framer Motion**: Per le animazioni fluide che ti terranno incollato allo schermo.
-* **TypeScript**: Perché vogliamo bene al nostro codice e odiamo gli errori a runtime.
+If you're curious about how this project was built:
+* **React 19 & Next.js 16**: Because we like speed.
+* **Tailwind CSS v4**: For an elegant, modern, and minimal look.
+* **Framer Motion**: For buttery-smooth animations that will keep your eyes glued to the screen.
+* **TypeScript**: Because we love our code and hate runtime errors.
 
-## 🚀 Provalo in Locale!
+## 🚀 Try it Locally!
 
-Vuoi metterci le mani sopra? Ottima idea.
-Assicurati di avere [Node.js](https://nodejs.org/) installato, poi apri il terminale e digita:
+Want to get your hands dirty? Great idea.
+Make sure you have [Node.js](https://nodejs.org/) installed, then open your terminal and type:
 
 ```bash
-# 1. Clona il progetto
+# 1. Clone the project
 git clone https://github.com/Astappetto02/algo-visualizer.git
 
-# 2. Entra nella cartella
+# 2. Go into the folder
 cd algo-visualizer
 
-# 3. Installa le dipendenze
+# 3. Install dependencies
 npm install
 
-# 4. Accendi i motori!
+# 4. Start your engines!
 npm run dev
 ```
 
-Ora apri il tuo browser preferito, vai su [http://localhost:3000](http://localhost:3000) e divertiti! 🎈
+Now open your favorite browser, go to [http://localhost:3000](http://localhost:3000) and have fun! 🎈
