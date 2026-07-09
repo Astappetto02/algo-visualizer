@@ -1,110 +1,54 @@
-# 🎓 Algorithmic Design Suite — SPA Visualizer
+# Algo Visualizer
 
-[![Live Demo](https://img.shields.io/badge/Live%20Demo-GitHub%20Pages-blue?style=for-the-badge)](https://astappetto02.github.io/algo-visualizer/)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-GitHub%20Pages-blue?style=flat-square)](https://astappetto02.github.io/algo-visualizer/)
 
-An interactive, premium Single Page Application (SPA) designed as an educational tool for university courses in **Algorithm Design & Analysis** (Progettazione e Analisi di Algoritmi). Built with Next.js, React, Tailwind CSS, and Framer Motion.
+A web-based interactive tool for visualizing computer science algorithms, built for students studying Algorithm Design and Analysis. 
 
----
+The application provides step-by-step visualizations of data structures and algorithms, helping users understand how they work under the hood.
 
-## 🌟 Key Features
+## Features
 
-* **13 Fully Visualized Algorithms**: Spanning all major curriculum paradigms (Divide & Conquer, Dynamic Programming, Greedy, and Graphs).
-* **Multi-Mode Visualization Canvas**: Automatically routes and renders the active step state into 5 custom layout engines:
-  1. **Bars Chart & Recursion Tree**: To display split divisions and merges (MergeSort, QuickSort, Binary Search).
-  2. **DP Matrix Grid**: 2D data matrix cells with active subproblem highlights (Fibonacci, Knapsack, Sequence Alignment).
-  3. **SVG Graph Layout**: Vector network nodes and edge weight lines with frontier traversal styling (BFS, DFS, Dijkstra, Bellman-Ford, Prim).
-  4. **Timeline Gantt**: Horizontal overlap segments mapped to a synchronized time axis (Interval Scheduling, Weighted Intervals).
-  5. **Prefix Binary Tree**: Binary hierarchy layout computed via weight queues (Huffman Coding).
-* **Step-by-Step Playback / Time-Travel**: Interactive media controllers (Play, Pause, Step Forward/Backward, and Speed scrubbers) to sweep through algorithm snapshots.
-* **Real-time Pseudocode & Variables Inspector**: Highlights the executing line of pseudocode side-by-side with local pointer variables (`low`, `high`, `mid`, `i`, `j`, etc.).
-* **Complexity & Theory Reference**: Theoretical panel mapping time bounds ($\Theta(n \log n)$ best/average/worst) and academic variants (In-place, Bottom-up, Timsort).
-* **Hydration Mismatch Shield**: Embedded React mount guards preventing browser extension conflicts.
+- **13 Algorithms Supported**: Covers major paradigms including Divide & Conquer, Dynamic Programming, Greedy, and Graphs.
+- **Dynamic Renderings**: Different layout engines for different algorithm types:
+  - Bar charts and recursion trees (sorting, binary search)
+  - 2D DP matrices (Fibonacci, Knapsack, Sequence Alignment)
+  - Node graphs (BFS, DFS, Dijkstra, Bellman-Ford, Prim)
+  - Gantt charts (Interval Scheduling)
+  - Binary trees (Huffman Coding)
+- **Execution Controls**: Play, pause, step forward/backward, and adjust playback speed.
+- **State Inspector**: Real-time tracking of pseudocode execution and local variables.
+- **Complexity Analysis**: Big-O bounds and theoretical notes for each algorithm.
 
----
+## Stack
 
-## 🛠️ Technology Stack
+- React 19 / Next.js 16
+- Tailwind CSS
+- Framer Motion
+- TypeScript
 
-* **Framework**: React 19 / Next.js 16 (App Router)
-* **Styling**: Tailwind CSS v4 (Glassmorphic panels, neon borders, and custom scrollbar animations)
-* **Animations**: Framer Motion
-* **Compiler**: Webpack (resolves dot-directory Turbopack watch restrictions)
-* **Language**: TypeScript
+## Local Development
 
----
+### Setup
 
-## 📂 Project Layout
+Clone the repository and install the dependencies:
 
-```
-algo-visualizer/
-├── src/
-│   ├── app/                         
-│   │   ├── layout.tsx               # Fonts and suppressHydrationWarning configs
-│   │   ├── globals.css              # Custom styling tokens
-│   │   └── page.tsx                 # Main entry dashboard page
-│   ├── components/                  
-│   │   ├── Sidebar.tsx              # Syllabus selection drawer
-│   │   ├── VisualizerCanvas.tsx     # 5-mode render canvas router
-│   │   ├── ControlPanel.tsx         # Media controllers
-│   │   ├── CodePanel.tsx            # Code highlighter & inspector tabs
-│   │   └── InputPanel.tsx           # Validations and random arrays
-│   ├── algorithms/                  
-│   │   ├── types.ts                 # Unified Snapshot type models
-│   │   ├── index.ts                 # Syllabus registries
-│   │   ├── mergeSort.ts             
-│   │   ├── binarySearch.ts          
-│   │   ├── quickSort.ts             
-│   │   ├── dynamicProgramming.ts    # DP Algorithms
-│   │   ├── greedy.ts                # Greedy Algorithms
-│   │   └── graphs.ts                # Graph Algorithms
-│   └── hooks/                       
-│       └── useAlgorithmRunner.ts    # Playback scrubber timer hook
+```bash
+git clone https://github.com/Astappetto02/algo-visualizer.git
+cd algo-visualizer
+npm install
 ```
 
----
+Start the development server:
 
-## 🚀 Getting Started
+```bash
+npm run dev
+```
 
-### Prerequisites
+Open [http://localhost:3000](http://localhost:3000) in your browser to see the app.
 
-You need [Node.js](https://nodejs.org/) installed on your computer.
+## Covered Algorithms
 
-### Installation & Run
-
-1. Open a terminal in the project directory:
-   ```bash
-   cd algo-visualizer
-   ```
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-3. Start the Webpack-forced development server:
-   ```bash
-   npm run dev
-   ```
-4. Open your browser and navigate to **[http://localhost:3000](http://localhost:3000)**.
-
----
-
-## 📊 Syllabus Summary
-
-### Module 1: Divide et Impera
-* **Binary Search**: Highlights the low/high search space and mid index.
-* **MergeSort**: Visualizes the divide phase and array element merging.
-* **QuickSort**: Lomuto partition swaps and pivot stabilizations.
-
-### Module 2: Programmazione Dinamica
-* **Fibonacci**: Bottom-up tabulation vector filling.
-* **Weighted Interval Scheduling**: M[j] computation, p[j] compatibility tracking, and solution backtracking.
-* **Sequence Alignment**: Global alignment matrix filling (Gap penalty = 1, Mismatch = 2).
-* **Knapsack**: DP capacity grid values and backtracking.
-
-### Module 3: Algoritmi Greedy
-* **Interval Scheduling**: Greedily picks earliest end-time compatible intervals.
-* **Huffman Coding**: Min-heap priority queue merges to build a prefix binary tree.
-
-### Module 4: Grafi e Cammini Minimi
-* **BFS & DFS Visits**: Explores adjacency list using FIFO queues or LIFO stacks.
-* **Dijkstra**: Single-source shortest path relaxation (weights non-negative).
-* **Bellman-Ford**: Negative weight edge relaxation and cycle check.
-* **Prim's MST**: Spanning tree cut selections.
+- **Divide & Conquer**: Binary Search, MergeSort, QuickSort
+- **Dynamic Programming**: Fibonacci, Weighted Interval Scheduling, Sequence Alignment, 0/1 Knapsack
+- **Greedy**: Interval Scheduling, Huffman Coding
+- **Graphs**: BFS, DFS, Dijkstra, Bellman-Ford, Prim
